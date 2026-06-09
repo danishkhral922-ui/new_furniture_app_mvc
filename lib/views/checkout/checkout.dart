@@ -111,7 +111,7 @@ class Checkout extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Payment',
+                          'Payment ',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,

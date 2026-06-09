@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
@@ -32,14 +31,11 @@ class ProductController extends GetxController {
     try {
       isLoading.value = true;
 
-      await FirebaseFirestore.instance.collection('products').add({
-        "name": nameController.text.trim(),
-        "price": double.tryParse(priceController.text.trim()) ?? 0.0,
-        "image": imageController.text.trim().isEmpty
-            ? 'fnansf'
-            : imageController.text.trim(),
-        "createdAt": FieldValue.serverTimestamp(),
-      });
+      await _services.saveProductToFirestore(
+        name: nameController.text.trim(),
+        price: double.tryParse(priceController.text.trim()) ?? 0.0,
+        image: imageController.text.trim(),
+      );
 
       nameController.clear();
       priceController.clear();

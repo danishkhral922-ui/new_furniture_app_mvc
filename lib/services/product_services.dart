@@ -11,4 +11,17 @@ class ProductServices {
       }).toList();
     });
   }
+
+  Future<void> saveProductToFirestore({
+    required String name,
+    required double price,
+    required String image,
+  }) async {
+    await _db.collection('products').add({
+      "name": name,
+      "price": price,
+      "image": image.isEmpty ? '' : image,
+      "createdAt": FieldValue.serverTimestamp(),
+    });
+  }
 }
