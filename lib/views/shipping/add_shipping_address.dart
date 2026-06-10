@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/shipping_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/switch_controller.dart';
-import 'package:new_furiniture_app_mvc/views/checkout/checkout.dart';
 
 class AddShippingAddress extends StatelessWidget {
   AddShippingAddress({super.key});

@@ -222,7 +222,6 @@ class Checkout extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
 
-                    // --- ORDER SUMMARY SECTION ---
                     SizedBox(
                       height: 135,
                       width: 335,
@@ -330,7 +329,6 @@ class Checkout extends StatelessWidget {
                   backgroundColor: Colors.black,
                 ),
                 onPressed: () async {
-                  // Pehle check karein ke data empty to nahi hai
                   if (shippingController.currentShipping.value == null) {
                     Get.snackbar(
                       'Missing Address',
@@ -351,14 +349,7 @@ class Checkout extends StatelessWidget {
                     return;
                   }
 
-                  // Agar data valid hai to Firebase save ka method yahan execute hoga
                   try {
-                    // Yahan aap apna Firebase order upload function call kar sakte hain, e.g:
-                    // await controller.uploadOrderToFirebase(
-                    //   address: shippingController.currentShipping.value!,
-                    //   payment: paymentController.currentPayment.value!,
-                    // );
-
                     Get.off(() => const Congrats());
                   } catch (e) {
                     Get.snackbar('Firebase Error', 'Failed to save order data');

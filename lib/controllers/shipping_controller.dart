@@ -6,15 +6,12 @@ import '../models/shipping_model.dart';
 class ShippingController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Text Editing Controllers jo UI fields ke saath map honge
   final nameController = TextEditingController();
   final addressController = TextEditingController();
 
-  // Observable variable text updates ke liye
   var fullname = ''.obs;
   var address = ''.obs;
 
-  // Current shipping address state holder
   var currentShipping = Rxn<ShippingModel>();
 
   @override
@@ -23,7 +20,6 @@ class ShippingController extends GetxController {
     fetchCurrentAddress();
   }
 
-  // Firebase se data lane ka function
   void fetchCurrentAddress() async {
     try {
       var doc = await _firestore
@@ -34,7 +30,6 @@ class ShippingController extends GetxController {
         var shippingData = ShippingModel.fromMap(doc.data()!);
         currentShipping.value = shippingData;
 
-        // Fields ko autofill karne ke liye jab screen load ho
         nameController.text = shippingData.fullName;
         addressController.text = shippingData.address;
       }
@@ -43,7 +38,6 @@ class ShippingController extends GetxController {
     }
   }
 
-  // Firebase mein save karne ka function
   Future<void> saveShippingAddress() async {
     if (nameController.text.isEmpty || addressController.text.isEmpty) {
       Get.snackbar(
@@ -66,7 +60,6 @@ class ShippingController extends GetxController {
           .doc('user_id_yahan_likhein')
           .set(newAddress.toMap());
 
-      // Local value instant update karein taake Checkout screen refresh ho jaye
       currentShipping.value = newAddress;
 
       Get.back();

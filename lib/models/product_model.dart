@@ -14,7 +14,6 @@ class ProductModel {
   });
 
   factory ProductModel.fromFirestore(String id, Map<String, dynamic> data) {
-    // Pehle check karein k description null ya empty to nahi
     String rawDescription = data['description'] ?? '';
 
     return ProductModel(
@@ -22,7 +21,7 @@ class ProductModel {
       name: data['name'] ?? '',
       price: data['price'] != null ? data['price'].toString() : '',
       image: data['image'] ?? '',
-      // Agar description khali string bhi ho, tab bhi default text show hoga
+
       description: rawDescription.trim().isEmpty
           ? 'Minimal Stand is made of natural wood. The design is very simple and minimal.'
           : rawDescription,
