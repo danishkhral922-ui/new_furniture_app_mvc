@@ -175,7 +175,8 @@ class Product extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 35),
+
+            const SizedBox(height: 50),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
