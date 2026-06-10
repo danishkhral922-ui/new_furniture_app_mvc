@@ -24,4 +24,8 @@ class ProductServices {
       "createdAt": FieldValue.serverTimestamp(),
     });
   }
+
+  Future<void> deleteProductFromFirestore(String productId) async {
+    await _db.collection('products').doc(productId).delete();
+  }
 }

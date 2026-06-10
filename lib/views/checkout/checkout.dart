@@ -73,10 +73,12 @@ class Checkout extends StatelessWidget {
                             children: [
                               Obx(
                                 () => Text(
+                                  // FIX: Added ?. and ?? fallback
                                   shippingController
-                                      .currentShipping
-                                      .value
-                                      .fullName,
+                                          .currentShipping
+                                          .value
+                                          ?.fullName ??
+                                      'No Name Provided',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 18,
@@ -89,10 +91,12 @@ class Checkout extends StatelessWidget {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Obx(
                                   () => Text(
+                                    // FIX: Added ?. and ?? fallback
                                     shippingController
-                                        .currentShipping
-                                        .value
-                                        .address,
+                                            .currentShipping
+                                            .value
+                                            ?.address ??
+                                        'No Address Provided',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 14,
@@ -134,9 +138,15 @@ class Checkout extends StatelessWidget {
                         color: Colors.white,
                         child: Row(
                           children: [
-                            Image.asset('assets/images/card.png'),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              child: Image.asset('assets/images/card.png'),
+                            ),
                             Obx(
                               () => Text(
+                                // FIX: Added ?. and ?? fallback
                                 paymentController
                                     .currentPayment
                                     .value

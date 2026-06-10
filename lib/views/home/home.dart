@@ -225,6 +225,42 @@ class Home extends StatelessWidget {
                                       'assets/images/shoppingbag2.png',
                                     ),
                                   ),
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Get.defaultDialog(
+                                          title: 'Delete Product',
+                                          middleText:
+                                              'Are you sure you want to delete this product?',
+                                          textConfirm: 'Yes',
+                                          textCancel: 'No',
+                                          confirmTextColor: Colors.white,
+                                          buttonColor: Colors.black,
+                                          cancelTextColor: Colors.black,
+                                          onConfirm: () {
+                                            Get.back();
+                                            productController.deleteProduct(
+                                              item.id,
+                                            );
+                                          },
+                                          onCancel: () {
+                                            Get.back();
+                                          },
+                                        );
+                                      },
+                                      child: const CircleAvatar(
+                                        radius: 15,
+                                        backgroundColor: Colors.white70,
+                                        child: Icon(
+                                          Icons.cancel_outlined,
+                                          color: Colors.black,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

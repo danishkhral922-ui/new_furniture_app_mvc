@@ -8,7 +8,7 @@ class ShippingController extends GetxController {
   var fullname = ''.obs;
   var address = ''.obs;
 
-  get currentShipping => null;
+  Rxn<dynamic> get currentShipping => Rxn<dynamic>();
 
   @override
   void dispose() {

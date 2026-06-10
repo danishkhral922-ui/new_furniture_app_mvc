@@ -62,4 +62,25 @@ class ProductController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> deleteProduct(String productId) async {
+    try {
+      await _services.deleteProductFromFirestore(productId);
+      Get.snackbar(
+        'Deleted',
+        'Product deleted successfully',
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to delete product: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 }
