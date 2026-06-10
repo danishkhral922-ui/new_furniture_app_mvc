@@ -71,7 +71,7 @@ class ProductController extends GetxController {
         'Product deleted successfully',
         backgroundColor: Colors.orange,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } catch (e) {
       Get.snackbar(
@@ -81,6 +81,56 @@ class ProductController extends GetxController {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
+    }
+  }
+
+  void SetEditfields(ProductModel product) {
+    nameController.text = product.name;
+    priceController.text = product.price.toString();
+    imageController.text = product.image;
+  }
+
+  Future<void> updateProduct(String ProductId) async {
+    if (nameController.text.trim().isEmpty ||
+        priceController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please fill all required fields',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+    try {
+      isLoading.value = true;
+      await _services.updateProductinfirestore(
+        ProductId: ProductId,
+        name: nameController.text.trim(),
+        price: double.tryParse(priceController.text.trim()) ?? 0.0,
+        image: imageController.text.trim(),
+      );
+      nameController.clear();
+      priceController.clear();
+      imageController.clear();
+      Get.back();
+      Get.snackbar(
+        'Success',
+        'Product updated successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Something went wrong: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 }

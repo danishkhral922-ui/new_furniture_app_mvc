@@ -28,4 +28,18 @@ class ProductServices {
   Future<void> deleteProductFromFirestore(String productId) async {
     await _db.collection('products').doc(productId).delete();
   }
+
+  Future<void> updateProductinfirestore({
+    required String ProductId,
+    required String name,
+    required double price,
+    required String image,
+  }) async {
+    await _db.collection('products').doc(ProductId).update({
+      "name": name,
+      "price": price,
+      "image": image.isEmpty ? '' : image,
+      "updatedAt": FieldValue.serverTimestamp(),
+    });
+  }
 }

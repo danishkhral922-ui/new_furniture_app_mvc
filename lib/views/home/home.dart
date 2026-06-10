@@ -7,6 +7,7 @@ import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
 import 'package:new_furiniture_app_mvc/views/favourites/fovourites.dart';
 import 'package:new_furiniture_app_mvc/views/notifications/notifications.dart';
 import 'package:new_furiniture_app_mvc/views/product/add_product.dart';
+import 'package:new_furiniture_app_mvc/views/product/edit_product.dart';
 import 'package:new_furiniture_app_mvc/views/profile/profile.dart';
 
 class Home extends StatelessWidget {
@@ -255,6 +256,33 @@ class Home extends StatelessWidget {
                                         backgroundColor: Colors.white70,
                                         child: Icon(
                                           Icons.cancel_outlined,
+                                          color: Colors.black,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 10,
+                                    left: 10,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        productController.SetEditfields(item);
+                                        Get.to(
+                                          EditProduct(
+                                            productId: item.id,
+                                            oldName: item.name,
+                                            oldPrice: item.price.toString(),
+                                            oldImage: item.image,
+                                          ),
+                                        );
+                                      },
+
+                                      child: const CircleAvatar(
+                                        radius: 15,
+                                        backgroundColor: Colors.white70,
+                                        child: Icon(
+                                          Icons.edit,
                                           color: Colors.black,
                                           size: 20,
                                         ),
