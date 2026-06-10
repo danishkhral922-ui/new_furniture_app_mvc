@@ -1,19 +1,19 @@
 class ShippingModel {
-  final String id;
-  final String fullName;
-  final String address;
+  String fullName;
+  String address;
 
-  ShippingModel({
-    required this.id,
-    required this.fullName,
-    required this.address,
-  });
+  ShippingModel({required this.fullName, required this.address});
 
-  factory ShippingModel.fromFirestore(String id, Map<String, dynamic> data) {
+  // Map (Firebase JSON) ko Model object mein convert karne ke liye
+  factory ShippingModel.fromMap(Map<String, dynamic> map) {
     return ShippingModel(
-      id: id,
-      fullName: data['fullName'] ?? '',
-      address: data['address'] ?? '',
+      fullName: map['fullName'] ?? '',
+      address: map['address'] ?? '',
     );
+  }
+
+  // Model object ko Map (Firebase JSON) mein convert karne ke liye
+  Map<String, dynamic> toMap() {
+    return {'fullName': fullName, 'address': address};
   }
 }

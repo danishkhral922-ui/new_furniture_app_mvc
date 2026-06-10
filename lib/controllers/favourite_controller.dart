@@ -27,4 +27,17 @@ class FavouriteController extends GetxController {
   Future<void> removeFavourite(String id) async {
     await _favouriteService.removeFavourite(id);
   }
+
+  bool isFavourite(String productName) {
+    return favouriteItems.any((element) => element.name == productName);
+  }
+
+  Future<void> removeFromFavourite(String name) async {
+    try {
+      final item = favouriteItems.firstWhere((element) => element.name == name);
+      await removeFavourite(item.id);
+    } catch (e) {
+      Get.snackbar('Error', 'Could not remove from favourites');
+    }
+  }
 }

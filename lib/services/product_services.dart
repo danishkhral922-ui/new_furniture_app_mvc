@@ -30,12 +30,12 @@ class ProductServices {
   }
 
   Future<void> updateProductinfirestore({
-    required String ProductId,
+    required String productId,
     required String name,
     required double price,
     required String image,
   }) async {
-    await _db.collection('products').doc(ProductId).update({
+    await _db.collection('products').doc(productId).update({
       "name": name,
       "price": price,
       "image": image.isEmpty ? '' : image,

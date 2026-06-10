@@ -9,6 +9,7 @@ import 'package:new_furiniture_app_mvc/views/notifications/notifications.dart';
 import 'package:new_furiniture_app_mvc/views/product/add_product.dart';
 import 'package:new_furiniture_app_mvc/views/product/edit_product.dart';
 import 'package:new_furiniture_app_mvc/views/profile/profile.dart';
+import 'package:new_furiniture_app_mvc/views/product/product.dart' as detail;
 
 class Home extends StatelessWidget {
   Home({super.key});
@@ -181,13 +182,7 @@ class Home extends StatelessWidget {
                       final item = products[index];
                       return GestureDetector(
                         onTap: () {
-                          Get.to(
-                            product(
-                              image: item.image,
-                              name: item.name,
-                              price: item.price.toString(),
-                            ),
-                          );
+                          Get.to(() => detail.Product(product: item));
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,6 +199,8 @@ class Home extends StatelessWidget {
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Image.network(
+                                        width: double.infinity,
+                                        height: double.infinity,
                                         item.image,
                                         fit: BoxFit.cover,
                                         errorBuilder:
@@ -277,7 +274,6 @@ class Home extends StatelessWidget {
                                           ),
                                         );
                                       },
-
                                       child: const CircleAvatar(
                                         radius: 15,
                                         backgroundColor: Colors.white70,
@@ -343,43 +339,6 @@ class Home extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget product({
-    required String image,
-    required String name,
-    required String price,
-  }) {
-    return Scaffold(
-      appBar: AppBar(title: Text(name)),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.network(
-              image,
-              height: 200,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, size: 100),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              '\$$price',
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

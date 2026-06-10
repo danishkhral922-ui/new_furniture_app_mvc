@@ -41,6 +41,7 @@ class Checkout extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
+                    // --- SHIPPING ADDRESS SECTION ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -53,7 +54,7 @@ class Checkout extends StatelessWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => Get.to(AddShippingAddress()),
+                          onTap: () => Get.to(() => AddShippingAddress()),
                           child: Image.asset('assets/images/edit.png'),
                         ),
                       ],
@@ -73,16 +74,21 @@ class Checkout extends StatelessWidget {
                             children: [
                               Obx(
                                 () => Text(
-                                  // FIX: Added ?. and ?? fallback
                                   shippingController
                                           .currentShipping
                                           .value
                                           ?.fullName ??
-                                      'No Name Provided',
-                                  style: const TextStyle(
+                                      'Click edit to add name',
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 18,
-                                    color: Colors.black,
+                                    color:
+                                        shippingController
+                                                .currentShipping
+                                                .value ==
+                                            null
+                                        ? Colors.red[300]
+                                        : Colors.black,
                                   ),
                                 ),
                               ),
@@ -91,12 +97,11 @@ class Checkout extends StatelessWidget {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Obx(
                                   () => Text(
-                                    // FIX: Added ?. and ?? fallback
                                     shippingController
                                             .currentShipping
                                             .value
                                             ?.address ??
-                                        'No Address Provided',
+                                        'No Shipping Address Added Yet',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 14,
@@ -111,11 +116,13 @@ class Checkout extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
+
+                    // --- PAYMENT SECTION ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Payment ',
+                          'Payment',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
@@ -123,7 +130,7 @@ class Checkout extends StatelessWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => Get.to(AddPayment()),
+                          onTap: () => Get.to(() => AddPayment()),
                           child: Image.asset('assets/images/edit.png'),
                         ),
                       ],
@@ -146,15 +153,19 @@ class Checkout extends StatelessWidget {
                             ),
                             Obx(
                               () => Text(
-                                // FIX: Added ?. and ?? fallback
                                 paymentController
-                                    .currentPayment
-                                    .value
-                                    .cardNumber,
-                                style: const TextStyle(
+                                        .currentPayment
+                                        .value
+                                        ?.cardNumber ??
+                                    'Click edit to add card details',
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
-                                  color: Colors.black,
+                                  color:
+                                      paymentController.currentPayment.value ==
+                                          null
+                                      ? Colors.red[300]
+                                      : Colors.black,
                                 ),
                               ),
                             ),
@@ -163,6 +174,8 @@ class Checkout extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
+
+                    // --- DELIVERY METHODS SECTION ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -177,7 +190,7 @@ class Checkout extends StatelessWidget {
                         Image.asset('assets/images/edit.png'),
                       ],
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 10),
                     SizedBox(
                       height: 68,
                       width: 335,
@@ -196,7 +209,7 @@ class Checkout extends StatelessWidget {
                             ),
                             const SizedBox(width: 20),
                             const Text(
-                              'Fast (2-3days)',
+                              'Fast (2-3 days)',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -208,6 +221,8 @@ class Checkout extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
+
+                    // --- ORDER SUMMARY SECTION ---
                     SizedBox(
                       height: 135,
                       width: 335,
@@ -218,35 +233,39 @@ class Checkout extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  ' Order :',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Colors.grey,
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    ' Order :',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  ' Delivery: ',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Colors.grey,
+                                  Text(
+                                    ' Delivery: ',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  ' Total:',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Colors.grey,
+                                  Text(
+                                    ' Total:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -296,6 +315,8 @@ class Checkout extends StatelessWidget {
               ),
             ),
           ),
+
+          // --- SUBMIT ORDER BUTTON ---
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: SizedBox(
@@ -308,8 +329,40 @@ class Checkout extends StatelessWidget {
                   ),
                   backgroundColor: Colors.black,
                 ),
-                onPressed: () {
-                  Get.off(Congrats());
+                onPressed: () async {
+                  // Pehle check karein ke data empty to nahi hai
+                  if (shippingController.currentShipping.value == null) {
+                    Get.snackbar(
+                      'Missing Address',
+                      'Please add your shipping address details first.',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                    );
+                    return;
+                  }
+
+                  if (paymentController.currentPayment.value == null) {
+                    Get.snackbar(
+                      'Missing Payment',
+                      'Please add your card information details first.',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                    );
+                    return;
+                  }
+
+                  // Agar data valid hai to Firebase save ka method yahan execute hoga
+                  try {
+                    // Yahan aap apna Firebase order upload function call kar sakte hain, e.g:
+                    // await controller.uploadOrderToFirebase(
+                    //   address: shippingController.currentShipping.value!,
+                    //   payment: paymentController.currentPayment.value!,
+                    // );
+
+                    Get.off(() => const Congrats());
+                  } catch (e) {
+                    Get.snackbar('Firebase Error', 'Failed to save order data');
+                  }
                 },
                 child: const Text(
                   'SUBMIT ORDER',
