@@ -90,7 +90,7 @@ class EditProduct extends StatelessWidget {
                         ),
                       )
                     : const Text(
-                        'UPDATE PRODUCT',
+                        'UPDATE  PRODUCT',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

@@ -84,7 +84,7 @@ class ProductController extends GetxController {
     }
   }
 
-  void SetEditfields(ProductModel product) {
+  Future<void> SetEditfields(ProductModel product) async {
     nameController.text = product.name;
     priceController.text = product.price.toString();
     imageController.text = product.image;
@@ -105,7 +105,7 @@ class ProductController extends GetxController {
     try {
       isLoading.value = true;
       await _services.updateProductinfirestore(
-        ProductId: ProductId,
+        productId: ProductId,
         name: nameController.text.trim(),
         price: double.tryParse(priceController.text.trim()) ?? 0.0,
         image: imageController.text.trim(),
