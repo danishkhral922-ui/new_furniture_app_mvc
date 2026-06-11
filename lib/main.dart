@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/firebase_options.dart';
-import 'package:new_furiniture_app_mvc/views/boarding/boarding.dart';
+import 'package:new_furiniture_app_mvc/views/auth/auth_wrapper.dart';
 import 'package:get/get.dart';
 
 void main() async {
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(primaryColorLight: Colors.white),
-      home: Boarding(),
+      home: AuthWrapper(),
     );
   }
 }

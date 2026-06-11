@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:new_furiniture_app_mvc/views/auth/auth_wrapper.dart';
 import 'package:new_furiniture_app_mvc/views/orders/orders.dart';
 import 'package:new_furiniture_app_mvc/views/payment/payment_method.dart';
 import 'package:new_furiniture_app_mvc/views/profile/rating_reviews.dart';
@@ -22,7 +24,22 @@ class Profile extends StatelessWidget {
           'Profile',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
         ),
-        actions: [Image.asset('assets/images/forward.png')],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: GestureDetector(
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Get.deleteAll();
+                Get.offAll(() => const AuthWrapper());
+              },
+              child: Image.asset(
+                'assets/images/forward.png',
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(

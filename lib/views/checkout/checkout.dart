@@ -156,14 +156,22 @@ class Checkout extends StatelessWidget {
                                 paymentController
                                         .currentPayment
                                         .value
-                                        ?.cardNumber ??
-                                    'Click edit to add card details',
+                                        .cardNumber
+                                        .isEmpty
+                                    ? 'Click edit to add card details'
+                                    : paymentController
+                                          .currentPayment
+                                          .value
+                                          .cardNumber,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
                                   color:
-                                      paymentController.currentPayment.value ==
-                                          null
+                                      paymentController
+                                          .currentPayment
+                                          .value
+                                          .cardNumber
+                                          .isEmpty
                                       ? Colors.red[300]
                                       : Colors.black,
                                 ),
@@ -222,6 +230,7 @@ class Checkout extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
 
+                    // --- ORDER SUMMARY SECTION ---
                     SizedBox(
                       height: 135,
                       width: 335,
@@ -328,7 +337,7 @@ class Checkout extends StatelessWidget {
                   ),
                   backgroundColor: Colors.black,
                 ),
-                onPressed: () async {
+                onPressed: () {
                   if (shippingController.currentShipping.value == null) {
                     Get.snackbar(
                       'Missing Address',
@@ -339,7 +348,11 @@ class Checkout extends StatelessWidget {
                     return;
                   }
 
-                  if (paymentController.currentPayment.value == null) {
+                  if (paymentController
+                      .currentPayment
+                      .value
+                      .cardNumber
+                      .isEmpty) {
                     Get.snackbar(
                       'Missing Payment',
                       'Please add your card information details first.',
@@ -349,11 +362,7 @@ class Checkout extends StatelessWidget {
                     return;
                   }
 
-                  try {
-                    Get.off(() => const Congrats());
-                  } catch (e) {
-                    Get.snackbar('Firebase Error', 'Failed to save order data');
-                  }
+                  Get.off(() => const Congrats());
                 },
                 child: const Text(
                   'SUBMIT ORDER',

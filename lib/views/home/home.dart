@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/bottomnav_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/product_controller.dart';
-import 'package:new_furiniture_app_mvc/models/product_model.dart';
+import 'package:new_furiniture_app_mvc/controllers/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
 import 'package:new_furiniture_app_mvc/views/favourites/fovourites.dart';
@@ -16,6 +16,13 @@ class Home extends StatelessWidget {
 
   final BottomNavController controller = Get.put(BottomNavController());
   final ProductController productController = Get.put(ProductController());
+
+  // fenix: true lagane se agar controller delete ho bhi jaye, to zaroorat parne par automatic restart ho jata hai
+  final HomeController homeController = Get.put(
+    HomeController(),
+    permanent: true,
+  );
+  final RxBool isSearching = false.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -93,28 +100,54 @@ class Home extends StatelessWidget {
         surfaceTintColor: Colors.white,
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const Icon(Icons.search, color: Colors.black),
+        leading: Obx(
+          () => GestureDetector(
+            onTap: () {
+              isSearching.value = !isSearching.value;
+              if (!isSearching.value) {
+                homeController.filterProducts('');
+              }
+            },
+            child: Icon(
+              isSearching.value ? Icons.close : Icons.search,
+              color: Colors.black,
+            ),
+          ),
+        ),
         centerTitle: true,
-        title: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Make Home',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            Text(
-              'BEAUTIFUL',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        title: Obx(
+          () => isSearching.value
+              ? TextField(
+                  autofocus: true,
+                  onChanged: (value) => homeController.filterProducts(value),
+                  style: const TextStyle(color: Colors.black, fontSize: 16),
+                  decoration: const InputDecoration(
+                    hintText: 'Search furniture...',
+                    border: InputBorder.none,
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                )
+              : const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Make Home',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Text(
+                      'BEAUTIFUL',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
         ),
         actions: [
           Padding(
@@ -136,184 +169,183 @@ class Home extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildCategoryItem(
-                  'assets/images/fav.png',
-                  'Popular',
-                  isSelected: true,
-                ),
-                _buildCategoryItem('assets/images/chair.png', 'Chair'),
-                _buildCategoryItem('assets/images/table.png', 'Table'),
-                _buildCategoryItem('assets/images/sofa.png', 'Armchair'),
-                _buildCategoryItem('assets/images/bed.png', 'Bed'),
-              ],
+            // Sahi Tareeqa: Obx ko Row ke baher lagaya taake andr ke dynamic states refresh hon
+            child: Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildCategoryItem(Icons.star_rounded, 'Popular'),
+                  _buildCategoryItem(Icons.chair_outlined, 'Chair'),
+                  _buildCategoryItem(Icons.table_restaurant_outlined, 'Table'),
+                  _buildCategoryItem(Icons.weekend_outlined, 'Armchair'),
+                  _buildCategoryItem(Icons.bed_outlined, 'Bed'),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 15),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: StreamBuilder<List<ProductModel>>(
-                stream: productController.productsStream,
-                builder: (context, snapshots) {
-                  if (snapshots.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: Colors.black),
-                    );
-                  }
+              child: Obx(() {
+                if (homeController.isLoading.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.black),
+                  );
+                }
 
-                  if (!snapshots.hasData || snapshots.data!.isEmpty) {
-                    return const Center(child: Text('No Products Found'));
-                  }
+                if (homeController.filteredProducts.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No Products Found',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  );
+                }
 
-                  var products = snapshots.data!;
-                  return GridView.builder(
-                    itemCount: products.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 20,
-                          childAspectRatio: 0.62,
-                          crossAxisCount: 2,
-                        ),
-                    itemBuilder: (context, index) {
-                      final item = products[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Get.to(() => detail.Product(product: item));
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Image.network(
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        item.image,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                              return const Center(
-                                                child: Icon(
-                                                  Icons.broken_image,
-                                                  color: Colors.grey,
-                                                  size: 40,
-                                                ),
-                                              );
-                                            },
-                                      ),
-                                    ),
+                return GridView.builder(
+                  itemCount: homeController.filteredProducts.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 20,
+                    childAspectRatio: 0.62,
+                    crossAxisCount: 2,
+                  ),
+                  itemBuilder: (context, index) {
+                    final item = homeController.filteredProducts[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(() => detail.Product(product: item));
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  Positioned(
-                                    bottom: 10,
-                                    right: 10,
-                                    child: Image.asset(
-                                      'assets/images/shoppingbag2.png',
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 10,
-                                    right: 10,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Get.defaultDialog(
-                                          title: 'Delete Product',
-                                          middleText:
-                                              'Are you sure you want to delete this product?',
-                                          textConfirm: 'Yes',
-                                          textCancel: 'No',
-                                          confirmTextColor: Colors.white,
-                                          buttonColor: Colors.black,
-                                          cancelTextColor: Colors.black,
-                                          onConfirm: () {
-                                            Get.back();
-                                            productController.deleteProduct(
-                                              item.id,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.network(
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      item.image,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey,
+                                                size: 40,
+                                              ),
                                             );
                                           },
-                                          onCancel: () {
-                                            Get.back();
-                                          },
-                                        );
-                                      },
-                                      child: const CircleAvatar(
-                                        radius: 15,
-                                        backgroundColor: Colors.white70,
-                                        child: Icon(
-                                          Icons.cancel_outlined,
-                                          color: Colors.black,
-                                          size: 20,
-                                        ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  right: 10,
+                                  child: Image.asset(
+                                    'assets/images/shoppingbag2.png',
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Get.defaultDialog(
+                                        title: 'Delete Product',
+                                        middleText:
+                                            'Are you sure you want to delete this product?',
+                                        textConfirm: 'Yes',
+                                        textCancel: 'No',
+                                        confirmTextColor: Colors.white,
+                                        buttonColor: Colors.black,
+                                        cancelTextColor: Colors.black,
+                                        onConfirm: () {
+                                          Get.back();
+                                          productController.deleteProduct(
+                                            item.id,
+                                          );
+                                        },
+                                        onCancel: () {
+                                          Get.back();
+                                        },
+                                      );
+                                    },
+                                    child: const CircleAvatar(
+                                      radius: 15,
+                                      backgroundColor: Colors.white70,
+                                      child: Icon(
+                                        Icons.cancel_outlined,
+                                        color: Colors.black,
+                                        size: 20,
                                       ),
                                     ),
                                   ),
-                                  Positioned(
-                                    top: 10,
-                                    left: 10,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        productController.SetEditfields(item);
-                                        Get.to(
-                                          EditProduct(
-                                            productId: item.id,
-                                            oldName: item.name,
-                                            oldPrice: item.price.toString(),
-                                            oldImage: item.image,
-                                          ),
-                                        );
-                                      },
-                                      child: const CircleAvatar(
-                                        radius: 15,
-                                        backgroundColor: Colors.white70,
-                                        child: Icon(
-                                          Icons.edit,
-                                          color: Colors.black,
-                                          size: 20,
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  left: 10,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      productController.SetEditfields(item);
+                                      Get.to(
+                                        EditProduct(
+                                          productId: item.id,
+                                          oldName: item.name,
+                                          oldPrice: item.price.toString(),
+                                          oldImage: item.image,
                                         ),
+                                      );
+                                    },
+                                    child: const CircleAvatar(
+                                      radius: 15,
+                                      backgroundColor: Colors.white70,
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Colors.black,
+                                        size: 20,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              item.name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            item.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(height: 5),
-                            Text(
-                              '\$${item.price}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            '\$${item.price}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }),
             ),
           ),
         ],
@@ -321,24 +353,37 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryItem(
-    String imagePath,
-    String label, {
-    bool isSelected = false,
-  }) {
-    return Column(
-      children: [
-        Image.asset(imagePath, width: 40),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.grey,
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
+  Widget _buildCategoryItem(IconData iconData, String label) {
+    final bool isActive = homeController.selectedCategory.value == label;
+    return GestureDetector(
+      onTap: () {
+        homeController.changeCategory(label);
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isActive ? Colors.black : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              iconData,
+              size: 26,
+              color: isActive ? Colors.white : Colors.grey[600],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: TextStyle(
+              color: isActive ? Colors.black : Colors.grey,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -77,7 +77,7 @@ class Product extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 5,
                             offset: const Offset(0, 2),
                           ),
@@ -166,7 +166,9 @@ class Product extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
-                product.description,
+                product.description.isNotEmpty
+                    ? product.description
+                    : 'No Description Available',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
