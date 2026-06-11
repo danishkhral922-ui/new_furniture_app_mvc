@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/cart_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/payment_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/shipping_controller.dart';
 import 'package:new_furiniture_app_mvc/views/congrats/congrats.dart';
@@ -13,6 +14,7 @@ class Checkout extends StatelessWidget {
   final CartController controller = Get.put(CartController());
   final ShippingController shippingController = Get.put(ShippingController());
   final PaymentController paymentController = Get.put(PaymentController());
+  final OrderController ordercontroller = Get.put(OrderController());
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,6 @@ class Checkout extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
-                    // --- SHIPPING ADDRESS SECTION ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -116,8 +117,6 @@ class Checkout extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
-
-                    // --- PAYMENT SECTION ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -151,39 +150,30 @@ class Checkout extends StatelessWidget {
                               ),
                               child: Image.asset('assets/images/card.png'),
                             ),
-                            Obx(
-                              () => Text(
-                                paymentController
-                                        .currentPayment
-                                        .value
-                                        .cardNumber
-                                        .isEmpty
+                            Obx(() {
+                              final paymentVal =
+                                  paymentController.currentPayment.value;
+                              final isEmpty =
+                                  paymentVal == null ||
+                                  paymentVal.cardNumber.isEmpty;
+                              return Text(
+                                isEmpty
                                     ? 'Click edit to add card details'
-                                    : paymentController
-                                          .currentPayment
-                                          .value
-                                          .cardNumber,
+                                    : paymentVal.cardNumber,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
-                                  color:
-                                      paymentController
-                                          .currentPayment
-                                          .value
-                                          .cardNumber
-                                          .isEmpty
+                                  color: isEmpty
                                       ? Colors.red[300]
                                       : Colors.black,
                                 ),
-                              ),
-                            ),
+                              );
+                            }),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(height: 30),
-
-                    // --- DELIVERY METHODS SECTION ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -229,8 +219,6 @@ class Checkout extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
-
-                    // --- ORDER SUMMARY SECTION ---
                     SizedBox(
                       height: 135,
                       width: 335,
@@ -323,8 +311,6 @@ class Checkout extends StatelessWidget {
               ),
             ),
           ),
-
-          // --- SUBMIT ORDER BUTTON ---
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: SizedBox(
@@ -337,7 +323,7 @@ class Checkout extends StatelessWidget {
                   ),
                   backgroundColor: Colors.black,
                 ),
-                onPressed: () {
+                onPressed: () async {
                   if (shippingController.currentShipping.value == null) {
                     Get.snackbar(
                       'Missing Address',
@@ -348,11 +334,8 @@ class Checkout extends StatelessWidget {
                     return;
                   }
 
-                  if (paymentController
-                      .currentPayment
-                      .value
-                      .cardNumber
-                      .isEmpty) {
+                  final paymentVal = paymentController.currentPayment.value;
+                  if (paymentVal == null || paymentVal.cardNumber.isEmpty) {
                     Get.snackbar(
                       'Missing Payment',
                       'Please add your card information details first.',
@@ -362,7 +345,25 @@ class Checkout extends StatelessWidget {
                     return;
                   }
 
-                  Get.off(() => const Congrats());
+                  try {
+                    await ordercontroller.placeNewOrder(
+                      totalQty: controller.cartItems.length.toString(),
+                      finalAmount: controller.totalPrice() + 5,
+                    );
+
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Congrats()),
+                      (route) => false,
+                    );
+                  } catch (e) {
+                    Get.snackbar(
+                      'Error',
+                      'Something went wrong: $e',
+                      backgroundColor: Colors.orange,
+                      colorText: Colors.white,
+                    );
+                  }
                 },
                 child: const Text(
                   'SUBMIT ORDER',

@@ -76,7 +76,7 @@ class Profile extends StatelessWidget {
               _buildMenuTile(
                 title: 'My orders',
                 subtitle: 'Already have 10 orders',
-                onTap: () => Get.to(() => const Orders()),
+                onTap: () => Get.to(() => OrderScreen()),
               ),
               const SizedBox(height: 15),
               _buildMenuTile(

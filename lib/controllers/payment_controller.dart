@@ -12,6 +12,20 @@ class PaymentController extends GetxController {
     id: '',
     cardNumber: '**** **** **** 3947',
   ).obs;
+  void savepaymentdetails() {
+    String rawcard = cardNumber.text.trim();
+    String maskedcard = rawcard;
+
+    if (rawcard.length == 16) {
+      maskedcard = '**** **** **** ${rawcard.substring(12, 16)}';
+    }
+    currentPayment.value = PaymentModel(
+      id: DateTime.now().toString(),
+      cardNumber: maskedcard.isNotEmpty
+          ? maskedcard
+          : currentPayment.value.cardNumber,
+    );
+  }
 
   void updatePayment(PaymentModel newPayment) {
     currentPayment.value = newPayment;

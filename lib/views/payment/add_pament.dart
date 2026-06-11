@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/payment_controller.dart';
 
 class AddPayment extends StatelessWidget {
   AddPayment({super.key});
 
-  final PaymentController paymentController = Get.put(PaymentController());
+  final PaymentController paymentController = Get.find<PaymentController>();
 
   @override
   Widget build(BuildContext context) {
@@ -222,6 +223,10 @@ class AddPayment extends StatelessWidget {
                                   controller: paymentController.expiryDate,
                                   keyboardType: TextInputType.number,
                                   maxLength: 5,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    CardExpiryInputFormatter(),
+                                  ],
                                   decoration: const InputDecoration(
                                     counterText: '',
                                     border: OutlineInputBorder(
@@ -272,10 +277,11 @@ class AddPayment extends StatelessWidget {
                     Get.snackbar('Error', 'CVV must be 3 digits');
                     return;
                   }
-                  if (paymentController.expiryDate.text.length != 5) {
+                  if (paymentController.expiryDate.text.length != 4) {
                     Get.snackbar('Error', 'Expiry Date format should be MM/YY');
                     return;
                   }
+                  paymentController.savepaymentdetails();
 
                   Get.back();
                 },
@@ -292,6 +298,38 @@ class AddPayment extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class CardExpiryInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String cleanText = newValue.text.replaceAll('/', '');
+
+    if (oldValue.text.length >= newValue.text.length) {
+      return newValue;
+    }
+
+    String formattedText = '';
+
+    if (cleanText.length >= 1) {
+      formattedText += cleanText.substring(
+        0,
+        cleanText.length >= 2 ? 2 : cleanText.length,
+      );
+    }
+
+    if (cleanText.length > 2) {
+      formattedText += '/' + cleanText.substring(2);
+    }
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
 }

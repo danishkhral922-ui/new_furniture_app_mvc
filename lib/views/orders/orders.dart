@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:new_furiniture_app_mvc/views/shipping/add_shipping.dart';
+import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
 
-class Orders extends StatelessWidget {
-  const Orders({super.key});
+class OrderScreen extends StatelessWidget {
+  OrderScreen({super.key});
+
+  final OrderController orderController = Get.put(OrderController());
 
   @override
   Widget build(BuildContext context) {
@@ -16,226 +18,107 @@ class Orders extends StatelessWidget {
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
         ),
-        centerTitle: true,
         title: const Text(
-          'My Order',
+          'My Orders',
           style: TextStyle(
+            fontWeight: FontWeight.w600,
             fontSize: 16,
-            fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),
+        centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      const Text(
-                        'Delivered',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        height: 4,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Processing',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const Text(
-                    'Canceled',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
+      body: Obx(() {
+        if (orderController.ordersList.isEmpty) {
+          return const Center(
+            child: Text(
+              'No orders placed yet.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(height: 20),
-              _buildOrderCard(
-                'Order No. 238562312',
-                '20/03/2020',
-                '03',
-                '150',
-                'Delivered',
-              ),
-              const SizedBox(height: 16),
-              _buildOrderCard(
-                'Order No. 238562312',
-                '20/03/2020',
-                '03',
-                '150',
-                'Delivered',
-              ),
-              const SizedBox(height: 16),
-              _buildOrderCard(
-                'Order No. 238562312',
-                '20/03/2020',
-                '03',
-                '150',
-                'Delivered',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
+          );
+        }
 
-  Widget _buildOrderCard(
-    String orderNo,
-    String date,
-    String quantity,
-    String totalAmount,
-    String status,
-  ) {
-    return SizedBox(
-      height: 172,
-      width: 335,
-      child: Card(
-        color: Colors.white,
-        shadowColor: Colors.grey.withAlpha(80),
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    orderNo,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    date,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(color: Colors.grey[200], height: 1),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(color: Colors.black, fontSize: 14),
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: orderController.ordersList.length,
+          itemBuilder: (context, index) {
+            final order = orderController.ordersList[index];
+            return Card(
+              //  margin: const EdgeInsets.bottom(16),
+              // shadowColor: Colors.grey.withValues(alpha),
+              elevation: 4,
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const TextSpan(
-                          text: 'Quantity: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
+                        Text(
+                          order.orderNo,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
                             fontSize: 16,
-                            color: Colors.grey,
+                            color: Colors.black,
                           ),
                         ),
-                        TextSpan(
-                          text: quantity,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        Text(
+                          order.date,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(color: Colors.black, fontSize: 14),
+                    const Divider(height: 20, thickness: 1),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const TextSpan(
-                          text: 'Total Amount: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
+                        Text(
+                          'Quantity: ${order.quantity}',
+                          style: const TextStyle(
                             color: Colors.grey,
+                            fontSize: 14,
                           ),
                         ),
-                        TextSpan(
-                          text: '\$$totalAmount',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        Text(
+                          'Total: \$${order.totalAmount}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () => Get.to(() => ShoppingAddress()),
-                  child: Container(
-                    height: 36,
-                    width: 100,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Detail',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          order.status,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 12.0, bottom: 8.0),
-                  child: Text(
-                    status,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }

@@ -64,7 +64,7 @@ class Congrats extends StatelessWidget {
                   backgroundColor: Colors.black,
                   elevation: 0,
                 ),
-                onPressed: () => Get.to(() => const Orders()),
+                onPressed: () => Get.to(() => OrderScreen()),
                 child: const Text(
                   'Track Your Orders',
                   style: TextStyle(
