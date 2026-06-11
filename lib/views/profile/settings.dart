@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/switch_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
 
 class Setting extends StatelessWidget {
   Setting({super.key});
 
   final controller = Get.put(SwitchController());
+  final profileController = Get.find<ProfileController>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +35,22 @@ class Setting extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Column(
             children: [
-              _buildSectionHeader('Personal Information', hasEdit: true),
+              _buildSectionHeader(
+                'Personal Information',
+                hasEdit: true,
+                onEditTap: () => _showEditNameDialog(context),
+              ),
               const SizedBox(height: 10),
-              _buildInfoCard('Name', 'Bruno Pham'),
+              Obx(
+                () => _buildInfoCard('Name', profileController.userName.value),
+              ),
               const SizedBox(height: 15),
-              _buildInfoCard('Email', 'bruno203@gmail.com'),
+              Obx(
+                () =>
+                    _buildInfoCard('Email', profileController.userEmail.value),
+              ),
               const SizedBox(height: 20),
-              _buildSectionHeader('Password', hasEdit: true),
+              _buildSectionHeader('Password', hasEdit: true, onEditTap: () {}),
               const SizedBox(height: 10),
               _buildInfoCard('Password', '***************'),
               const SizedBox(height: 20),
@@ -61,7 +72,11 @@ class Setting extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title, {bool hasEdit = false}) {
+  Widget _buildSectionHeader(
+    String title, {
+    bool hasEdit = false,
+    VoidCallback? onEditTap,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -73,7 +88,11 @@ class Setting extends StatelessWidget {
             color: Colors.grey,
           ),
         ),
-        if (hasEdit) Image.asset('assets/images/edit.png', color: Colors.grey),
+        if (hasEdit)
+          GestureDetector(
+            onTap: onEditTap,
+            child: Image.asset('assets/images/edit.png', color: Colors.grey),
+          ),
       ],
     );
   }
@@ -189,6 +208,59 @@ class Setting extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showEditNameDialog(BuildContext context) {
+    final TextEditingController nameController = TextEditingController(
+      text: profileController.userName.value,
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            'Edit Name',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          content: TextField(
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: 'Full Name',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('CANCEL', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              onPressed: () async {
+                if (nameController.text.trim().isNotEmpty) {
+                  await profileController.updateProfile(
+                    nameController.text.trim(),
+                  );
+                  Get.back();
+                } else {
+                  Get.snackbar(
+                    'Error',
+                    'Name cannot be empty',
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
+                  );
+                }
+              },
+              child: const Text('SAVE', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
