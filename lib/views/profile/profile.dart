@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
 import 'package:new_furiniture_app_mvc/views/auth/auth_wrapper.dart';
 import 'package:new_furiniture_app_mvc/views/orders/orders.dart';
 import 'package:new_furiniture_app_mvc/views/payment/payment_method.dart';
@@ -9,7 +11,10 @@ import 'package:new_furiniture_app_mvc/views/profile/settings.dart';
 import 'package:new_furiniture_app_mvc/views/shipping/add_shipping.dart';
 
 class Profile extends StatelessWidget {
-  const Profile({super.key});
+  Profile({super.key});
+
+  final ProfileController profileController = Get.put(ProfileController());
+  final OrderController orderController = Get.put(OrderController());
 
   @override
   Widget build(BuildContext context) {
@@ -50,22 +55,26 @@ class Profile extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/profile.png'),
                   const SizedBox(width: 20),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Bruno Pham',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
+                      Obx(
+                        () => Text(
+                          profileController.userName.value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 20,
+                          ),
                         ),
                       ),
-                      Text(
-                        'bruno203@gmail.com',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          color: Colors.grey,
+                      Obx(
+                        () => Text(
+                          profileController.userEmail.value,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ],
@@ -73,10 +82,13 @@ class Profile extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
-              _buildMenuTile(
-                title: 'My orders',
-                subtitle: 'Already have 10 orders',
-                onTap: () => Get.to(() => OrderScreen()),
+              Obx(
+                () => _buildMenuTile(
+                  title: 'My orders',
+                  subtitle:
+                      'Already have ${orderController.ordersList.length} orders',
+                  onTap: () => Get.to(() => OrderScreen()),
+                ),
               ),
               const SizedBox(height: 15),
               _buildMenuTile(

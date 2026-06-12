@@ -27,7 +27,7 @@ class SnackController extends GetxController {
         'Invalid Email',
         'Please enter valid email',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       return;

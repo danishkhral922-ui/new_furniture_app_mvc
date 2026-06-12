@@ -40,13 +40,13 @@ class AddShippingAddress extends StatelessWidget {
                   children: [
                     _buildInputField(
                       label: 'Full Name',
-                      hint: 'Ex: Bruno Pham',
+                      hint: 'Ex: Danish Abrar',
                       controller: shippingcontroller.nameController,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
                       label: 'Address',
-                      hint: 'Ex: 25 Robert Latouche Street',
+                      hint: 'Ex: Johar Town, Lahore',
                       controller: shippingcontroller.addressController,
                     ),
                     const SizedBox(height: 100),
@@ -76,19 +76,15 @@ class AddShippingAddress extends StatelessWidget {
                       "Required",
                       "Please fill name and address fields",
                       snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red[400],
+                      colorText: Colors.white,
                     );
                     return;
                   }
 
-                  shippingcontroller.fullname.value = shippingcontroller
-                      .nameController
-                      .text
-                      .trim();
-                  shippingcontroller.address.value = shippingcontroller
-                      .addressController
-                      .text
-                      .trim();
                   shippingcontroller.saveShippingAddress();
+
+                  Get.back();
                 },
                 child: const Text(
                   'SAVE ADDRESS',

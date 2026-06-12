@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
@@ -20,22 +21,13 @@ class ProfileController extends GetxController {
     if (uid != null) {
       userEmail.value = _auth.currentUser?.email ?? 'No Email';
 
-      _firestore
-          .collection('users')
-          .doc(uid)
-          .snapshots()
-          .listen(
-            (snapshot) {
-              if (snapshot.exists && snapshot.data() != null) {
-                userName.value = snapshot.data()?['name'] ?? 'No Name';
-              } else {
-                userName.value = _auth.currentUser?.displayName ?? 'User';
-              }
-            },
-            onError: (error) {
-              print("Error fetching user data: $error");
-            },
-          );
+      _firestore.collection('users').doc(uid).snapshots().listen((snapshot) {
+        if (snapshot.exists && snapshot.data() != null) {
+          userName.value = snapshot.data()?['name'] ?? 'No Name';
+        } else {
+          userName.value = _auth.currentUser?.displayName ?? 'User';
+        }
+      }, onError: (error) {});
     }
   }
 
@@ -53,10 +45,22 @@ class ProfileController extends GetxController {
 
         userName.value = newName;
 
-        Get.snackbar('Success', 'Profile updated successfully!');
+        Get.snackbar(
+          'Success',
+          'Profile updated successfully!',
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
+          snackPosition: SnackPosition.TOP,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to save data: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to save data: $e',
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+      );
     }
   }
 }

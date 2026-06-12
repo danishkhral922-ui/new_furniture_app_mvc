@@ -48,8 +48,6 @@ class OrderScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final order = orderController.ordersList[index];
             return Card(
-              //  margin: const EdgeInsets.bottom(16),
-              // shadowColor: Colors.grey.withValues(alpha),
               elevation: 4,
               color: Colors.white,
               child: Padding(

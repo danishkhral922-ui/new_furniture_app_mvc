@@ -79,7 +79,7 @@ class ProductController extends GetxController {
         'Failed to delete product: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     }
   }
@@ -98,7 +98,7 @@ class ProductController extends GetxController {
         'Please fill all required fields',
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
@@ -119,7 +119,7 @@ class ProductController extends GetxController {
         'Product updated successfully',
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } catch (e) {
       Get.snackbar(
@@ -127,7 +127,7 @@ class ProductController extends GetxController {
         'Something went wrong: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
     } finally {
       isLoading.value = false;

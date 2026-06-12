@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
 
@@ -40,7 +41,13 @@ class HomeController extends GetxController {
       });
     } catch (e) {
       isLoading.value = false;
-      Get.snackbar('Error', e.toString());
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        colorText: Colors.white,
+        backgroundColor: Colors.red[400],
+        snackPosition: SnackPosition.TOP,
+      );
     }
   }
 

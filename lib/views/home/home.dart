@@ -17,7 +17,6 @@ class Home extends StatelessWidget {
   final BottomNavController controller = Get.put(BottomNavController());
   final ProductController productController = Get.put(ProductController());
 
-  // fenix: true lagane se agar controller delete ho bhi jaye, to zaroorat parne par automatic restart ho jata hai
   final HomeController homeController = Get.put(
     HomeController(),
     permanent: true,
@@ -169,7 +168,7 @@ class Home extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            // Sahi Tareeqa: Obx ko Row ke baher lagaya taake andr ke dynamic states refresh hon
+
             child: Obx(
               () => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

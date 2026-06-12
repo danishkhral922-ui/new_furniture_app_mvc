@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/models/favourite_model.dart';
 import 'package:new_furiniture_app_mvc/services/favourites_servies.dart';
@@ -37,7 +38,13 @@ class FavouriteController extends GetxController {
       final item = favouriteItems.firstWhere((element) => element.name == name);
       await removeFavourite(item.id);
     } catch (e) {
-      Get.snackbar('Error', 'Could not remove from favourites');
+      Get.snackbar(
+        'Error',
+        'Could not remove from favourites',
+        colorText: Colors.white,
+        backgroundColor: Colors.red[400],
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }

@@ -7,7 +7,9 @@ class Setting extends StatelessWidget {
   Setting({super.key});
 
   final controller = Get.put(SwitchController());
-  final profileController = Get.find<ProfileController>();
+  final profileController = Get.isRegistered<ProfileController>()
+      ? Get.find<ProfileController>()
+      : Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {

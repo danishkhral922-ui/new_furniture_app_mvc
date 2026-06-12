@@ -168,7 +168,7 @@ class Product extends StatelessWidget {
               child: Text(
                 product.description.isNotEmpty
                     ? product.description
-                    : 'No Description Available',
+                    : 'This product is made of high-quality materials and designed to provide both comfort and style. It features a modern design that will complement and enhance the look of any room.',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
@@ -194,7 +194,7 @@ class Product extends StatelessWidget {
                           Get.snackbar(
                             'Removed',
                             'Removed From Favourites',
-                            backgroundColor: Colors.orange,
+                            backgroundColor: Colors.red,
                             colorText: Colors.white,
                             snackPosition: SnackPosition.TOP,
                           );

@@ -72,7 +72,7 @@ class AddPayment extends StatelessWidget {
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
                               ),
-                              hintText: 'Ex: Bruno Pham',
+                              hintText: 'Ex: Danish Abrar',
                               hintStyle: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -266,19 +266,43 @@ class AddPayment extends StatelessWidget {
                 ),
                 onPressed: () {
                   if (paymentController.cardHolderName.text.trim().isEmpty) {
-                    Get.snackbar('Error', 'Please enter card holder name');
+                    Get.snackbar(
+                      'Error',
+                      'Please enter card holder name',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.TOP,
+                    );
                     return;
                   }
                   if (paymentController.cardNumber.text.length != 16) {
-                    Get.snackbar('Error', 'Card Number must be 16 digits');
+                    Get.snackbar(
+                      'Error',
+                      'Card Number must be 16 digits',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.TOP,
+                    );
                     return;
                   }
                   if (paymentController.cvv.text.length != 3) {
-                    Get.snackbar('Error', 'CVV must be 3 digits');
+                    Get.snackbar(
+                      'Error',
+                      'CVV must be 3 digits',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.TOP,
+                    );
                     return;
                   }
                   if (paymentController.expiryDate.text.length != 4) {
-                    Get.snackbar('Error', 'Expiry Date format should be MM/YY');
+                    Get.snackbar(
+                      'Error',
+                      'Expiry Date format should be MM/YY',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      snackPosition: SnackPosition.TOP,
+                    );
                     return;
                   }
                   paymentController.savepaymentdetails();

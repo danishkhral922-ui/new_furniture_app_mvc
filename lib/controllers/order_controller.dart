@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
@@ -32,9 +33,21 @@ class OrderController extends GetxController {
       );
 
       await _orderService.saveOrder(newOrder);
-      Get.snackbar('Success', 'Order Placed Successfully');
+      Get.snackbar(
+        'Success',
+        'Order Placed Successfully',
+        colorText: Colors.white,
+        backgroundColor: Colors.green[400],
+        snackPosition: SnackPosition.TOP,
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Firebase Save Failed: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to place order: $e',
+        colorText: Colors.white,
+        backgroundColor: Colors.red[400],
+        snackPosition: SnackPosition.TOP,
+      );
       rethrow;
     }
   }

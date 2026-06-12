@@ -19,8 +19,9 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Error',
         'Passwords do no match',
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[400],
         colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
@@ -40,16 +41,18 @@ class AuthController extends GetxController {
         Get.snackbar(
           'Success',
           'Account Created Successfully',
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.green[400],
           colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
         );
       }
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         'Error',
         e.message ?? 'Something went wrong',
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[400],
         colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
     }
   }
@@ -64,16 +67,18 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Success',
         'Login Successful',
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green[400],
         colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
       Get.offAll(Home());
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         'Error',
         e.message ?? 'Something went wrong',
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[400],
         colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
       );
     }
   }
@@ -83,8 +88,9 @@ class AuthController extends GetxController {
     Get.snackbar(
       'Logout',
       'User Logged Out',
-      backgroundColor: Colors.orange,
+      backgroundColor: Colors.orange[400],
       colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
     );
   }
 
