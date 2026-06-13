@@ -2,9 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/shipping_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ShippingController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final Box<ShippingModel> _shippingBox = Hive.box<ShippingModel>(
+    'shipping_box',
+  );
 
   final nameController = TextEditingController();
   final addressController = TextEditingController();
@@ -22,6 +26,11 @@ class ShippingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    if (_shippingBox.isNotEmpty) {
+      shippingAddresses.assignAll(_shippingBox.values.toList());
+      selectAddress(0);
+    }
+
     fetchCurrentAddress();
   }
 
@@ -38,6 +47,8 @@ class ShippingController extends GetxController {
             shippingAddresses.add(ShippingModel.fromMap(doc.data()!));
           }
         }
+        await _shippingBox.clear();
+        await _shippingBox.addAll(shippingAddresses);
 
         if (shippingAddresses.isNotEmpty) {
           selectAddress(0);
@@ -65,6 +76,14 @@ class ShippingController extends GetxController {
         fullName: nameController.text,
         address: addressController.text,
       );
+      await _shippingBox.add(newAddress);
+      shippingAddresses.add(newAddress);
+
+      selectAddress(shippingAddresses.length - 1);
+      nameController.clear();
+      addressController.clear();
+
+      Get.back();
 
       String docId = _firestore.collection('shipping_addresses').doc().id;
 
@@ -116,6 +135,13 @@ class ShippingController extends GetxController {
         fullName: editNameController.text,
         address: editAddressController.text,
       );
+      await _shippingBox.putAt(index, updatedAddress);
+      shippingAddresses[index] = updatedAddress;
+
+      if (selectedAddressIndex.value == index) {
+        currentShipping.value = updatedAddress;
+      }
+      Get.back();
 
       var querySnapshot = await _firestore
           .collection('shipping_addresses')

@@ -1,5 +1,11 @@
+import 'package:hive/hive.dart';
+part 'shipping_model.g.dart';
+
+@HiveType(typeId: 1)
 class ShippingModel {
+  @HiveField(0)
   String fullName;
+  @HiveField(1)
   String address;
 
   ShippingModel({required this.fullName, required this.address});
