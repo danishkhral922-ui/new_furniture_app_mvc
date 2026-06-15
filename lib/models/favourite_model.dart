@@ -1,7 +1,14 @@
+import 'package:hive/hive.dart';
+
+@HiveType(typeId: 3)
 class FavouriteModel {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final String price;
+  @HiveField(3)
   final String image;
 
   FavouriteModel({

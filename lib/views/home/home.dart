@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/bottomnav_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/product_controller.dart';
@@ -16,7 +17,6 @@ class Home extends StatelessWidget {
 
   final BottomNavController controller = Get.put(BottomNavController());
   final ProductController productController = Get.put(ProductController());
-
   final HomeController homeController = Get.put(
     HomeController(),
     permanent: true,
@@ -168,18 +168,15 @@ class Home extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-
-            child: Obx(
-              () => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildCategoryItem(Icons.star_rounded, 'Popular'),
-                  _buildCategoryItem(Icons.chair_outlined, 'Chair'),
-                  _buildCategoryItem(Icons.table_restaurant_outlined, 'Table'),
-                  _buildCategoryItem(Icons.weekend_outlined, 'Armchair'),
-                  _buildCategoryItem(Icons.bed_outlined, 'Bed'),
-                ],
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildCategoryItem(Icons.star_rounded, 'Popular'),
+                _buildCategoryItem(Icons.chair_outlined, 'Chair'),
+                _buildCategoryItem(Icons.table_restaurant_outlined, 'Table'),
+                _buildCategoryItem(Icons.weekend_outlined, 'Armchair'),
+                _buildCategoryItem(Icons.bed_outlined, 'Bed'),
+              ],
             ),
           ),
           const SizedBox(height: 15),
@@ -230,21 +227,25 @@ class Home extends StatelessWidget {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(20),
-                                    child: Image.network(
+                                    child: CachedNetworkImage(
                                       width: double.infinity,
                                       height: double.infinity,
-                                      item.image,
+                                      imageUrl: item.image,
                                       fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                            return const Center(
-                                              child: Icon(
-                                                Icons.broken_image,
-                                                color: Colors.grey,
-                                                size: 40,
-                                              ),
-                                            );
-                                          },
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                      errorWidget: (context, url, error) =>
+                                          const Center(
+                                            child: Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey,
+                                              size: 40,
+                                            ),
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -353,36 +354,38 @@ class Home extends StatelessWidget {
   }
 
   Widget _buildCategoryItem(IconData iconData, String label) {
-    final bool isActive = homeController.selectedCategory.value == label;
-    return GestureDetector(
-      onTap: () {
-        homeController.changeCategory(label);
-      },
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isActive ? Colors.black : Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
+    return Obx(() {
+      final bool isActive = homeController.selectedCategory.value == label;
+      return GestureDetector(
+        onTap: () {
+          homeController.changeCategory(label);
+        },
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isActive ? Colors.black : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                iconData,
+                size: 26,
+                color: isActive ? Colors.white : Colors.grey[600],
+              ),
             ),
-            child: Icon(
-              iconData,
-              size: 26,
-              color: isActive ? Colors.white : Colors.grey[600],
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: isActive ? Colors.black : Colors.grey,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
+                fontSize: 12,
+              ),
             ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            style: TextStyle(
-              color: isActive ? Colors.black : Colors.grey,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

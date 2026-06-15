@@ -15,8 +15,8 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(ShippingModelAdapter());
   Hive.registerAdapter(ProductModelAdapter());
-  Hive.openBox<ShippingModel>('Shipping_box');
-  Hive.openBox<ProductModel>('Product_box');
+  await Hive.openBox<ShippingModel>('Shipping_box');
+  await Hive.openBox<ProductModel>('Products_box');
   runApp(const MyApp());
 }
 

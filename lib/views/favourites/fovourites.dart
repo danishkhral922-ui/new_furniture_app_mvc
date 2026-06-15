@@ -37,8 +37,24 @@ class Favourite extends StatelessWidget {
           ),
         ],
       ),
-      body: Obx(
-        () => ListView.builder(
+      body: Obx(() {
+        if (favouriteController.isLoading.value &&
+            favouriteController.favouriteItems.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.black),
+          );
+        }
+
+        if (favouriteController.favouriteItems.isEmpty) {
+          return const Center(
+            child: Text(
+              'Your favorites list is empty',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
+        }
+
+        return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           itemCount: favouriteController.favouriteItems.length,
           itemBuilder: (context, index) {
@@ -121,8 +137,8 @@ class Favourite extends StatelessWidget {
               ],
             );
           },
-        ),
-      ),
+        );
+      }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: SizedBox(
         height: 50,
@@ -130,6 +146,8 @@ class Favourite extends StatelessWidget {
         child: FloatingActionButton(
           backgroundColor: Colors.black,
           onPressed: () async {
+            if (favouriteController.favouriteItems.isEmpty) return;
+
             for (var item in favouriteController.favouriteItems) {
               await cartController.addToCart(
                 name: item.name,
