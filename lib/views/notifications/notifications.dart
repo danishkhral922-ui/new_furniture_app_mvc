@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:new_furiniture_app_mvc/views/congrats/congrats.dart';
+import 'package:new_furiniture_app_mvc/controllers/notification_controller.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+  NotificationsScreen({super.key});
+
+  final NotificationController controller = Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
@@ -14,73 +16,65 @@ class NotificationsScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
         leading: const Icon(Icons.search),
         centerTitle: true,
-        title: GestureDetector(
-          onTap: () => Get.to(() => const Congrats()),
-          child: const Text(
-            'Notifications',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
+        title: const Text(
+          'Notifications',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
           ),
         ),
       ),
-      body: ListView(
-        children: const [
-          NotificationTile(
-            imagePath: 'assets/images/minimalstand2.png',
-            title: 'Your order #123456789 has been confirmed',
-            isRead: false,
-          ),
-          NotificationTile(
-            imagePath: 'assets/images/minimallamp2.png',
-            title: 'Your order #123456789 has been Canceled',
-            isRead: true,
-          ),
-          NotificationTile(
-            title: 'Discover hot sale furnitures this week.',
-            isRead: false,
-            hasImage: false,
-          ),
-          NotificationTile(
-            imagePath: 'assets/images/coffeetable2.png',
-            title: 'Your order #123456789 has been Shipped Successfully',
-            isRead: true,
-          ),
-          NotificationTile(
-            imagePath: 'assets/images/coffeetable2.png',
-            title: 'Your order #123456789 has been Confirmed',
-            isRead: true,
-          ),
-          NotificationTile(
-            imagePath: 'assets/images/minimaldesk2.png',
-            title: 'Your order #123456789 has been Canceled',
-            isRead: true,
-          ),
-          NotificationTile(
-            imagePath: 'assets/images/coffeetable2.png',
-            title: 'Your order #123456789 has been shipped Successfully',
-            isRead: true,
-          ),
-        ],
-      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.black),
+          );
+        }
+
+        if (controller.notificationList.isEmpty) {
+          return const Center(
+            child: Text(
+              'No new notifications available',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          itemCount: controller.notificationList.length,
+          itemBuilder: (context, index) {
+            final notification = controller.notificationList[index];
+
+            return GestureDetector(
+              onTap: () =>
+                  controller.MarkNotificationAsread(index, notification.id),
+              child: NotificationTile(
+                title: notification.title,
+                description: notification.description,
+                isRead: notification.isRead,
+                imageUrl: notification.imageUrl,
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }
 
 class NotificationTile extends StatelessWidget {
-  final String? imagePath;
+  final String imageUrl;
   final String title;
+  final String description;
   final bool isRead;
-  final bool hasImage;
 
   const NotificationTile({
     super.key,
-    this.imagePath,
+    required this.imageUrl,
     required this.title,
+    required this.description,
     required this.isRead,
-    this.hasImage = true,
   });
 
   @override
@@ -92,23 +86,34 @@ class NotificationTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (hasImage && imagePath != null) ...[
-            SizedBox(
-              height: 70,
-              width: 70,
-              child: Image.asset(imagePath!, fit: BoxFit.cover),
+          SizedBox(
+            height: 70,
+            width: 70,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey,
+                    ),
+                  );
+                },
+              ),
             ),
-            const SizedBox(width: 10),
-          ] else ...[
-            const SizedBox(width: 10),
-          ],
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
@@ -117,11 +122,11 @@ class NotificationTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Turpis pretium et in arcu adipiscing nec. Turpis pretium et in arcu adipiscing nec.',
+                Text(
+                  description,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w400,
                     color: Colors.grey,
