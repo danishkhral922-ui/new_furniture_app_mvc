@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
 import 'package:new_furiniture_app_mvc/services/product_services.dart';
 
-class ProductController extends GetxController {
+class ProductProvider extends ChangeNotifier {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final imageController = TextEditingController();
@@ -13,23 +12,38 @@ class ProductController extends GetxController {
       _services.getProductsStream();
 
   final formKey = GlobalKey<FormState>();
-  var isLoading = false.obs;
+  bool isLoading = false;
 
-  Future<void> addProduct() async {
+  void _showSnackBar(
+    BuildContext context,
+    String title,
+    String message,
+    Color bgColor,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$title: $message'),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> addProduct(BuildContext context) async {
     if (nameController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty) {
-      Get.snackbar(
+      _showSnackBar(
+        context,
         'Error',
         'Please fill all required fields',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        Colors.red,
       );
       return;
     }
 
     try {
-      isLoading.value = true;
+      isLoading = true;
+      notifyListeners();
 
       await _services.saveProductToFirestore(
         name: nameController.text.trim(),
@@ -41,96 +55,105 @@ class ProductController extends GetxController {
       priceController.clear();
       imageController.clear();
 
-      Get.back();
-
-      Get.snackbar(
-        'Success',
-        'Product Added Successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      if (context.mounted) {
+        Navigator.pop(context);
+        _showSnackBar(
+          context,
+          'Success',
+          'Product Added Successfully',
+          Colors.green,
+        );
+      }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Something went wrong: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      if (context.mounted) {
+        _showSnackBar(context, 'Error', 'Something went wrong: $e', Colors.red);
+      }
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      notifyListeners();
     }
   }
 
-  Future<void> deleteProduct(String productId) async {
+  Future<void> deleteProduct(BuildContext context, String productId) async {
     try {
       await _services.deleteProductFromFirestore(productId);
-      Get.snackbar(
-        'Deleted',
-        'Product deleted successfully',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        _showSnackBar(
+          context,
+          'Deleted',
+          'Product deleted successfully',
+          Colors.orange,
+        );
+      }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to delete product: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        _showSnackBar(
+          context,
+          'Error',
+          'Failed to delete product: $e',
+          Colors.red,
+        );
+      }
     }
   }
 
-  Future<void> SetEditfields(ProductModel product) async {
+  Future<void> setEditFields(ProductModel product) async {
     nameController.text = product.name;
     priceController.text = product.price.toString();
     imageController.text = product.image;
+    notifyListeners();
   }
 
-  Future<void> updateProduct(String ProductId) async {
+  Future<void> updateProduct(BuildContext context, String productId) async {
     if (nameController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty) {
-      Get.snackbar(
+      _showSnackBar(
+        context,
         'Error',
         'Please fill all required fields',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
+        Colors.red,
       );
       return;
     }
     try {
-      isLoading.value = true;
+      isLoading = true;
+      notifyListeners();
+
       await _services.updateProductinfirestore(
-        productId: ProductId,
+        productId: productId,
         name: nameController.text.trim(),
         price: double.tryParse(priceController.text.trim()) ?? 0.0,
         image: imageController.text.trim(),
       );
+
       nameController.clear();
       priceController.clear();
       imageController.clear();
-      Get.back();
-      Get.snackbar(
-        'Success',
-        'Product updated successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        _showSnackBar(
+          context,
+          'Success',
+          'Product updated successfully',
+          Colors.green,
+        );
+      }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Something went wrong: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        _showSnackBar(context, 'Error', 'Something went wrong: $e', Colors.red);
+      }
     } finally {
-      isLoading.value = false;
+      isLoading = false;
+      notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    priceController.dispose();
+    imageController.dispose();
+    super.dispose();
   }
 }

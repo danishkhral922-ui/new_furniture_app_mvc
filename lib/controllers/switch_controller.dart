@@ -1,9 +1,18 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-class SwitchController extends GetxController {
-  RxBool switch1 = true.obs;
-  RxBool switch2 = false.obs;
+class SwitchProvider extends ChangeNotifier {
+  bool switch1 = true;
+  bool switch2 = false;
 
-  void toggleSwitch1() => switch1.toggle();
-  void toggleSwitch2() => switch2.toggle();
+  void toggleSwitch1() {
+    switch1 = !switch1;
+    notifyListeners();
+  }
+
+  void toggleSwitch2() {
+    switch2 = !switch2;
+    notifyListeners();
+  }
+
+  void setSwitch1(bool value) {}
 }

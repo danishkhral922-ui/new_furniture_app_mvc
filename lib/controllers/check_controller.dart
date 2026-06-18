@@ -1,13 +1,18 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-class CheckController extends GetxController {
-  RxBool check1 = true.obs;
-  RxBool check2 = false.obs;
-  RxBool check3 = false.obs;
+class CheckProvider extends ChangeNotifier {
+  bool _check1 = true;
+  bool _check2 = false;
+  bool _check3 = false;
+
+  bool get check1 => _check1;
+  bool get check2 => _check2;
+  bool get check3 => _check3;
 
   void changeSelection(int index) {
-    check1.value = index == 1;
-    check2.value = index == 2;
-    check3.value = index == 3;
+    _check1 = index == 1;
+    _check2 = index == 2;
+    _check3 = index == 3;
+    notifyListeners();
   }
 }

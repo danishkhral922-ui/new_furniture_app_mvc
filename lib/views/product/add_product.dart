@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/product_controller.dart';
+import 'package:provider/provider.dart';
 
 class AddProduct extends StatelessWidget {
-  AddProduct({super.key});
-
-  final ProductController controller = Get.put(ProductController());
+  const AddProduct({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final productProvider = context.read<ProductProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -23,12 +22,11 @@ class AddProduct extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Form(
-            key: controller.formKey,
+            key: productProvider.formKey,
             child: Column(
               children: [
-                // Product Name Field
                 TextFormField(
-                  controller: controller.nameController,
+                  controller: productProvider.nameController,
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
@@ -46,10 +44,8 @@ class AddProduct extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Price Field
                 TextFormField(
-                  controller: controller.priceController,
+                  controller: productProvider.priceController,
                   keyboardType: TextInputType.number,
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
@@ -68,10 +64,8 @@ class AddProduct extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Image URL Field
                 TextFormField(
-                  controller: controller.imageController,
+                  controller: productProvider.imageController,
                   style: TextStyle(
                     color: isDarkMode ? Colors.white : Colors.black,
                   ),
@@ -89,42 +83,46 @@ class AddProduct extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 30),
-
-                // Submit Button
                 SizedBox(
                   width: double.infinity,
                   height: 55,
-                  child: Obx(
-                    () => ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                  child: Consumer<ProductProvider>(
+                    builder: (context, provider, child) {
+                      return ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          backgroundColor: isDarkMode
+                              ? Colors.white
+                              : Colors.black,
                         ),
-                        backgroundColor: isDarkMode
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : () => controller.addProduct(),
-                      child: controller.isLoading.value
-                          ? SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: isDarkMode ? Colors.black : Colors.white,
-                                strokeWidth: 2.5,
+                        onPressed: provider.isLoading
+                            ? null
+                            : () => provider.addProduct(context),
+                        child: provider.isLoading
+                            ? SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: isDarkMode
+                                      ? Colors.black
+                                      : Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : Text(
+                                'ADD PRODUCT',
+                                style: TextStyle(
+                                  color: isDarkMode
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            )
-                          : Text(
-                              'ADD PRODUCT',
-                              style: TextStyle(
-                                color: isDarkMode ? Colors.black : Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],

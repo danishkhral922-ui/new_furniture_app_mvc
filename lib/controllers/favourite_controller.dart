@@ -1,18 +1,20 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:new_furiniture_app_mvc/models/favourite_model.dart';
 import 'package:new_furiniture_app_mvc/services/favourites_servies.dart';
 
-class FavouriteController extends GetxController {
+class FavouriteProvider extends ChangeNotifier {
   final FavouriteService _favouriteService = FavouriteService();
-  RxList<FavouriteModel> favouriteItems = <FavouriteModel>[].obs;
+  List<FavouriteModel> _favouriteItems = [];
   late Box<FavouriteModel> _favouriteBox;
-  RxBool isLoading = true.obs;
+  bool _isLoading = true;
+  StreamSubscription<List<FavouriteModel>>? _streamSubscription;
 
-  @override
-  void onInit() {
-    super.onInit();
+  List<FavouriteModel> get favouriteItems => _favouriteItems;
+  bool get isLoading => _isLoading;
+
+  FavouriteProvider() {
     _initHiveAndStream();
   }
 
@@ -25,19 +27,25 @@ class FavouriteController extends GetxController {
 
     _loadOfflineItems();
 
-    favouriteItems.bindStream(_favouriteService.getFavouriteStream());
+    _streamSubscription = _favouriteService.getFavouriteStream().listen((
+      items,
+    ) async {
+      _favouriteItems = items;
 
-    ever(favouriteItems, (List<FavouriteModel> items) async {
+      // Hive syncing logic
       await _favouriteBox.clear();
       await _favouriteBox.addAll(items);
-      isLoading.value = false;
+
+      _isLoading = false;
+      notifyListeners();
     });
   }
 
   void _loadOfflineItems() {
     if (_favouriteBox.isNotEmpty) {
-      favouriteItems.assignAll(_favouriteBox.values.toList());
-      isLoading.value = false;
+      _favouriteItems = _favouriteBox.values.toList();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -58,21 +66,31 @@ class FavouriteController extends GetxController {
   }
 
   bool isFavourite(String productName) {
-    return favouriteItems.any((element) => element.name == productName);
+    return _favouriteItems.any((element) => element.name == productName);
   }
 
-  Future<void> removeFromFavourite(String name) async {
+  Future<void> removeFromFavourite(BuildContext context, String name) async {
     try {
-      final item = favouriteItems.firstWhere((element) => element.name == name);
+      final item = _favouriteItems.firstWhere(
+        (element) => element.name == name,
+      );
       await removeFavourite(item.id);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Could not remove from favourites',
-        colorText: Colors.white,
-        backgroundColor: Colors.red[400],
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Could not remove from favourites'),
+            backgroundColor: Colors.red[400],
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
   }
 }

@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/cart_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/favourite_controller.dart';
+import 'package:provider/provider.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
 import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
-import 'package:get/get.dart';
 
 class Product extends StatelessWidget {
   final ProductModel product;
 
-  Product({super.key, required this.product});
-
-  final CartController controller = Get.put(CartController());
-  final FavouriteController favouriteController = Get.put(
-    FavouriteController(),
-  );
+  const Product({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final cartProvider = context.read<CartProvider>();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -27,7 +23,6 @@ class Product extends StatelessWidget {
           children: [
             Stack(
               children: [
-                // Top Image Container with Banner Arc
                 Container(
                   width: screenWidth,
                   height: 380,
@@ -69,12 +64,11 @@ class Product extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Floating Back Arrow Button
                 Positioned(
                   top: 50,
                   left: 20,
                   child: GestureDetector(
-                    onTap: () => Get.back(),
+                    onTap: () => Navigator.pop(context),
                     child: Container(
                       height: 40,
                       width: 40,
@@ -105,8 +99,6 @@ class Product extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 25),
-
-            // Product Name
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
@@ -119,8 +111,6 @@ class Product extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-
-            // Price & Static Quantity Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
@@ -146,8 +136,6 @@ class Product extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 15),
-
-            // Rating & Reviews Indicator
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
@@ -175,8 +163,6 @@ class Product extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Description Box
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
@@ -192,61 +178,66 @@ class Product extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 50),
-
-            // Bottom Action Bar (Favorite & Add To Cart Button)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  Obx(() {
-                    final isFav = favouriteController.isFavourite(product.name);
-                    return GestureDetector(
-                      onTap: () async {
-                        if (isFav) {
-                          await favouriteController.removeFromFavourite(
-                            product.name,
-                          );
-                          Get.snackbar(
-                            'Removed',
-                            'Removed From Favourites',
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            snackPosition: SnackPosition.TOP,
-                          );
-                        } else {
-                          await favouriteController.addToFavourite(
-                            name: product.name,
-                            price: product.price.toString(),
-                            image: product.image,
-                          );
-                          Get.snackbar(
-                            'Success',
-                            'Added To Favourites',
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                            snackPosition: SnackPosition.TOP,
-                          );
-                        }
-                      },
-                      child: Container(
-                        height: 55,
-                        width: 55,
-                        decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? Colors.grey[850]
-                              : Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
+                  Consumer<FavouriteProvider>(
+                    builder: (context, favouriteProvider, child) {
+                      final isFav = favouriteProvider.isFavourite(product.name);
+                      return GestureDetector(
+                        onTap: () async {
+                          if (isFav) {
+                            await favouriteProvider.removeFromFavourite(
+                              context,
+                              product.name,
+                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Removed From Favourites'),
+                                  backgroundColor: Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          } else {
+                            await favouriteProvider.addToFavourite(
+                              name: product.name,
+                              price: product.price.toString(),
+                              image: product.image,
+                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Added To Favourites'),
+                                  backgroundColor: Colors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: Container(
+                          height: 55,
+                          width: 55,
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? Colors.grey[850]
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: isFav
+                                ? Colors.red
+                                : (isDarkMode ? Colors.white : Colors.black),
+                            size: 26,
+                          ),
                         ),
-                        child: Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          color: isFav
-                              ? Colors.red
-                              : (isDarkMode ? Colors.white : Colors.black),
-                          size: 26,
-                        ),
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: SizedBox(
@@ -262,19 +253,26 @@ class Product extends StatelessWidget {
                           ),
                         ),
                         onPressed: () async {
-                          await controller.addToCart(
+                          await cartProvider.addToCart(
                             name: product.name,
                             price: product.price,
                             image: product.image,
                           );
-                          Get.snackbar(
-                            'Success',
-                            'Product Added To Cart',
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                            snackPosition: SnackPosition.TOP,
-                          );
-                          Get.to(() => Cart());
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Product Added To Cart'),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Cart(),
+                              ),
+                            );
+                          }
                         },
                         child: Text(
                           'Add to cart',

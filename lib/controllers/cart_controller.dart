@@ -1,15 +1,18 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/models/cart_model.dart';
 import 'package:new_furiniture_app_mvc/services/cart_services.dart';
 
-class CartController extends GetxController {
+class CartProvider extends ChangeNotifier {
   final CartService _cartService = CartService();
-  RxList<CartModel> cartItems = <CartModel>[].obs;
+  List<CartModel> _cartItems = [];
 
-  @override
-  void onInit() {
-    super.onInit();
-    cartItems.bindStream(_cartService.getCartStream());
+  List<CartModel> get cartItems => _cartItems;
+
+  CartProvider() {
+    _cartService.getCartStream().listen((items) {
+      _cartItems = items;
+      notifyListeners();
+    });
   }
 
   Future<void> addToCart({
@@ -21,13 +24,13 @@ class CartController extends GetxController {
   }
 
   Future<void> increaseQuantity(String id) async {
-    final item = cartItems.firstWhere((element) => element.id == id);
+    final item = _cartItems.firstWhere((element) => element.id == id);
     int quantity = item.quantity + 1;
     await _cartService.updateQuantity(id, quantity);
   }
 
   Future<void> decreaseQuantity(String id) async {
-    final item = cartItems.firstWhere((element) => element.id == id);
+    final item = _cartItems.firstWhere((element) => element.id == id);
     if (item.quantity > 1) {
       int quantity = item.quantity - 1;
       await _cartService.updateQuantity(id, quantity);
@@ -40,7 +43,7 @@ class CartController extends GetxController {
 
   double totalPrice() {
     double total = 0;
-    for (var item in cartItems) {
+    for (var item in _cartItems) {
       String priceString = item.price.replaceAll('\$', '');
       double price = double.tryParse(priceString) ?? 0;
       total += price * item.quantity;

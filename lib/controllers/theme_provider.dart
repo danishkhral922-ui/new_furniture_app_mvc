@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AppthemeProvider with ChangeNotifier {
-  bool _islightMode = true;
-  bool get islightMode => _islightMode;
+class AppThemeProvider with ChangeNotifier {
+  bool _isLightMode = true;
+
+  bool get isLightMode => _isLightMode;
+
   ThemeData get currentTheme {
-    return _islightMode
+    return _isLightMode
         ? ThemeData.light().copyWith(scaffoldBackgroundColor: Colors.white)
         : ThemeData.dark().copyWith(scaffoldBackgroundColor: Colors.grey[900]);
   }
 
   void toggleTheme() {
-    _islightMode = !_islightMode;
+    _isLightMode = !_isLightMode;
     notifyListeners();
   }
 }

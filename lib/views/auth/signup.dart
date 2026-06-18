@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/auth_controller.dart';
-import 'package:new_furiniture_app_mvc/controllers/signup_controller.dart';
 import 'package:new_furiniture_app_mvc/views/auth/login.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class Signup extends StatelessWidget {
   Signup({super.key});
-  final SignupController controller = Get.put(SignupController());
-  final AuthController authController = Get.put(AuthController());
+
+  final ValueNotifier<bool> isPasswordHidden = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> isConfirmPasswordHidden = ValueNotifier<bool>(true);
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final authProvider = context.read<AuthProvider>();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -56,7 +57,7 @@ class Signup extends StatelessWidget {
                     child: Column(
                       children: [
                         TextFormField(
-                          controller: authController.nameController,
+                          controller: authProvider.nameController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
@@ -69,7 +70,7 @@ class Signup extends StatelessWidget {
                         const Divider(thickness: 1),
                         const SizedBox(height: 20),
                         TextFormField(
-                          controller: authController.emailController,
+                          controller: authProvider.emailController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
@@ -81,55 +82,66 @@ class Signup extends StatelessWidget {
                         const SizedBox(height: 20),
                         const Divider(thickness: 1),
                         const SizedBox(height: 20),
-                        Obx(
-                          () => TextFormField(
-                            controller: authController.passwordController,
-                            obscureText: controller.passwordHidden.value,
-                            decoration: InputDecoration(
-                              border: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              hintText: 'Password',
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  controller.togglePassword();
-                                },
-                                icon: Icon(
-                                  controller.passwordHidden.value
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
+
+                        // Password Field Input Observer
+                        ValueListenableBuilder<bool>(
+                          valueListenable: isPasswordHidden,
+                          builder: (context, isHidden, child) {
+                            return TextFormField(
+                              controller: authProvider.passwordController,
+                              obscureText: isHidden,
+                              decoration: InputDecoration(
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                hintText: 'Password',
+                                hintStyle: const TextStyle(color: Colors.grey),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    isPasswordHidden.value =
+                                        !isPasswordHidden.value;
+                                  },
+                                  icon: Icon(
+                                    isHidden
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 20),
                         const Divider(thickness: 1),
                         const SizedBox(height: 20),
-                        Obx(
-                          () => TextFormField(
-                            controller:
-                                authController.confirmpasswordController,
-                            obscureText: controller.confirmPasswordHidden.value,
-                            decoration: InputDecoration(
-                              border: const OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                              ),
-                              hintText: 'Confirm Password',
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  controller.toggleConfirmPassword();
-                                },
-                                icon: Icon(
-                                  controller.confirmPasswordHidden.value
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
+
+                        ValueListenableBuilder<bool>(
+                          valueListenable: isConfirmPasswordHidden,
+                          builder: (context, isHidden, child) {
+                            return TextFormField(
+                              controller:
+                                  authProvider.confirmpasswordController,
+                              obscureText: isHidden,
+                              decoration: InputDecoration(
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                hintText: 'Confirm Password',
+                                hintStyle: const TextStyle(color: Colors.grey),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    isConfirmPasswordHidden.value =
+                                        !isConfirmPasswordHidden.value;
+                                  },
+                                  icon: Icon(
+                                    isHidden
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 20),
                         const Divider(thickness: 1),
@@ -147,8 +159,17 @@ class Signup extends StatelessWidget {
                               ),
                             ),
                             onPressed: () async {
-                              await authController.signUp();
-                              Get.offAll(Login());
+                              await authProvider.signUp(context);
+
+                              if (context.mounted) {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Login(),
+                                  ),
+                                  (route) => false,
+                                );
+                              }
                             },
                             child: Text(
                               'SIGN UP',
@@ -174,7 +195,13 @@ class Signup extends StatelessWidget {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Get.offAll(Login());
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Login(),
+                                  ),
+                                  (route) => false,
+                                );
                               },
                               child: const Text(
                                 'SIGN IN',

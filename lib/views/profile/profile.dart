@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
+import 'package:provider/provider.dart';
 import 'package:new_furiniture_app_mvc/views/auth/auth_wrapper.dart';
 import 'package:new_furiniture_app_mvc/views/orders/orders.dart';
 import 'package:new_furiniture_app_mvc/views/payment/payment_method.dart';
@@ -11,14 +11,14 @@ import 'package:new_furiniture_app_mvc/views/profile/settings.dart';
 import 'package:new_furiniture_app_mvc/views/shipping/add_shipping.dart';
 
 class Profile extends StatelessWidget {
-  Profile({super.key});
-
-  final ProfileController profileController = Get.put(ProfileController());
-  final OrderController orderController = Get.put(OrderController());
+  const Profile({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    final profileProvider = context.watch<ProfileProvider>();
+    final orderProvider = context.watch<OrderProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -34,8 +34,15 @@ class Profile extends StatelessWidget {
             child: GestureDetector(
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
-                Get.deleteAll();
-                Get.offAll(() => const AuthWrapper());
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AuthWrapper(),
+                    ),
+                    (route) => false,
+                  );
+                }
               },
               child: Image.asset(
                 'assets/images/forward.png',
@@ -57,23 +64,19 @@ class Profile extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Obx(
-                        () => Text(
-                          profileController.userName.value,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 20,
-                          ),
+                      Text(
+                        profileProvider.userName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
                         ),
                       ),
-                      Obx(
-                        () => Text(
-                          profileController.userEmail.value,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
+                      Text(
+                        profileProvider.userEmail,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: Colors.grey,
                         ),
                       ),
                     ],
@@ -81,37 +84,64 @@ class Profile extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30),
-              Obx(
-                () => _buildMenuTile(
-                  title: 'My orders',
-                  subtitle:
-                      'Already have ${orderController.ordersList.length} orders',
-                  onTap: () => Get.to(() => OrderScreen()),
-                ),
+              _buildMenuTile(
+                title: 'My orders',
+                subtitle:
+                    'Already have ${orderProvider.ordersList.length} orders',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrderScreen(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 15),
               _buildMenuTile(
                 title: 'Shipping Addresses',
                 subtitle: '03 Addresses',
-                onTap: () => Get.to(() => ShoppingAddress()),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ShoppingAddress()),
+                  );
+                },
               ),
               const SizedBox(height: 15),
               _buildMenuTile(
                 title: 'Payment Method',
                 subtitle: 'You have 2 cards',
-                onTap: () => Get.to(() => PaymentMethods()),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PaymentMethods()),
+                  );
+                },
               ),
               const SizedBox(height: 15),
               _buildMenuTile(
                 title: 'My reviews',
                 subtitle: 'Reviews for 5 items',
-                onTap: () => Get.to(() => const RatingReviews()),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RatingReviews(),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 15),
               _buildMenuTile(
                 title: 'Setting',
                 subtitle: 'Notification, Password, FAQ, Contact',
-                onTap: () => Get.to(() => Setting()),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Setting()),
+                  );
+                },
               ),
             ],
           ),

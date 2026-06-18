@@ -1,30 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/cart_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
-import 'package:new_furiniture_app_mvc/controllers/payment_controller.dart';
+import 'package:provider/provider.dart';
 import 'package:new_furiniture_app_mvc/controllers/shipping_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/payment_controller.dart';
 import 'package:new_furiniture_app_mvc/views/congrats/congrats.dart';
-import 'package:new_furiniture_app_mvc/views/payment/add_pament.dart';
 import 'package:new_furiniture_app_mvc/views/shipping/add_shipping_address.dart';
+import 'package:new_furiniture_app_mvc/views/payment/add_pament.dart';
 
 class Checkout extends StatelessWidget {
-  Checkout({super.key});
-
-  final CartController controller = Get.put(CartController());
-  final ShippingController shippingController = Get.put(ShippingController());
-  final PaymentController paymentController = Get.put(PaymentController());
-  final OrderController ordercontroller = Get.put(OrderController());
+  const Checkout({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final cartProvider = context.watch<CartProvider>();
+    final shippingProvider = context.watch<ShippingProvider>();
+    final paymentProvider = context.watch<PaymentProvider>();
+    final orderProvider = context.read<OrderProvider>();
+
+    final shippingVal = shippingProvider.currentShipping;
+    final paymentVal = paymentProvider.currentPayment;
+
+    final isShippingEmpty = shippingVal == null;
+    final isPaymentEmpty = paymentVal == null || paymentVal.cardNumber.isEmpty;
 
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Get.back();
+            Navigator.pop(context);
           },
           child: const Icon(Icons.arrow_back_ios),
         ),
@@ -54,7 +59,14 @@ class Checkout extends StatelessWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => Get.to(() => AddShippingAddress()),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddShippingAddress(),
+                              ),
+                            );
+                          },
                           child: Image.asset(
                             'assets/images/edit.png',
                             color: isDarkMode ? Colors.white : Colors.black,
@@ -73,43 +85,31 @@ class Checkout extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Obx(
-                                () => Text(
-                                  shippingController
-                                          .currentShipping
-                                          .value
-                                          ?.fullName ??
-                                      'Click edit to add name',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18,
-                                    color:
-                                        shippingController
-                                                .currentShipping
-                                                .value ==
-                                            null
-                                        ? Colors.red[300]
-                                        : (isDarkMode
-                                              ? Colors.white
-                                              : Colors.black),
-                                  ),
+                              Text(
+                                isShippingEmpty
+                                    ? 'Click edit to add name'
+                                    : shippingVal.fullName,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: isShippingEmpty
+                                      ? Colors.red[300]
+                                      : (isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
                                 ),
                               ),
                               Divider(color: Colors.grey[200], thickness: 2),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Obx(
-                                  () => Text(
-                                    shippingController
-                                            .currentShipping
-                                            .value
-                                            ?.address ??
-                                        'No Shipping Address Added Yet',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
+                                child: Text(
+                                  isShippingEmpty
+                                      ? 'No Shipping Address Added Yet'
+                                      : shippingVal.address,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                    color: Colors.grey,
                                   ),
                                 ),
                               ),
@@ -131,7 +131,14 @@ class Checkout extends StatelessWidget {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => Get.to(() => AddPayment()),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddPayment(),
+                              ),
+                            );
+                          },
                           child: Image.asset(
                             'assets/images/edit.png',
                             color: isDarkMode ? Colors.white : Colors.black,
@@ -156,27 +163,20 @@ class Checkout extends StatelessWidget {
                                 color: isDarkMode ? Colors.white : null,
                               ),
                             ),
-                            Obx(() {
-                              final paymentVal =
-                                  paymentController.currentPayment.value;
-                              final isEmpty =
-                                  paymentVal == null ||
-                                  paymentVal.cardNumber.isEmpty;
-                              return Text(
-                                isEmpty
-                                    ? 'Click edit to add card details'
-                                    : paymentVal.cardNumber,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                  color: isEmpty
-                                      ? Colors.red[300]
-                                      : (isDarkMode
-                                            ? Colors.white
-                                            : Colors.black),
-                                ),
-                              );
-                            }),
+                            Text(
+                              isPaymentEmpty
+                                  ? 'Click edit to add card details'
+                                  : paymentVal.cardNumber,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: isPaymentEmpty
+                                    ? Colors.red[300]
+                                    : (isDarkMode
+                                          ? Colors.white
+                                          : Colors.black),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -277,16 +277,14 @@ class Checkout extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Obx(
-                                    () => Text(
-                                      '\$ ${controller.totalPrice().toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
+                                  Text(
+                                    '\$ ${cartProvider.totalPrice().toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                   Text(
@@ -299,16 +297,14 @@ class Checkout extends StatelessWidget {
                                           : Colors.black,
                                     ),
                                   ),
-                                  Obx(
-                                    () => Text(
-                                      '\$ ${(controller.totalPrice() + 5).toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
+                                  Text(
+                                    '\$ ${(cartProvider.totalPrice() + 5).toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                 ],
@@ -337,41 +333,57 @@ class Checkout extends StatelessWidget {
                   backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () async {
-                  if (shippingController.currentShipping.value == null) {
-                    Get.snackbar(
-                      'Missing Address',
-                      'Please add your shipping address details first.',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
+                  if (isShippingEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Please add your shipping address details first.',
+                        ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                      ),
                     );
                     return;
                   }
 
-                  final paymentVal = paymentController.currentPayment.value;
-                  if (paymentVal == null || paymentVal.cardNumber.isEmpty) {
-                    Get.snackbar(
-                      'Missing Payment',
-                      'Please add your card information details first.',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
+                  if (isPaymentEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Please add your card information details first.',
+                        ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                      ),
                     );
                     return;
                   }
 
                   try {
-                    await ordercontroller.placeNewOrder(
-                      totalQty: controller.cartItems.length.toString(),
-                      finalAmount: controller.totalPrice() + 5,
+                    await orderProvider.placeNewOrder(
+                      totalQty: cartProvider.cartItems.length.toString(),
+                      finalAmount: cartProvider.totalPrice() + 5,
                     );
 
-                    Get.offAll(() => const Congrats());
+                    if (context.mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Congrats(),
+                        ),
+                        (route) => false,
+                      );
+                    }
                   } catch (e) {
-                    Get.snackbar(
-                      'Error',
-                      'Something went wrong: $e',
-                      backgroundColor: Colors.orange,
-                      colorText: Colors.white,
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Something went wrong: $e'),
+                          backgroundColor: Colors.orange,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
                   }
                 },
                 child: Text(

@@ -1,18 +1,32 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'dart:async';
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/order_model.dart';
 import '../services/order_services.dart';
 
-class OrderController extends GetxController {
+class OrderProvider extends ChangeNotifier {
   final OrderService _orderService = OrderService();
-  var ordersList = <OrderModel>[].obs;
 
-  @override
-  void onInit() {
-    super.onInit();
-    ordersList.bindStream(_orderService.getOrdersStream());
+  List<OrderModel> _ordersList = [];
+  StreamSubscription<List<OrderModel>>? _ordersSubscription;
+
+  OrderProvider() {
+    _initOrdersStream();
+  }
+
+  List<OrderModel> get ordersList => _ordersList;
+
+  void _initOrdersStream() {
+    _ordersSubscription = _orderService.getOrdersStream().listen(
+      (orders) {
+        _ordersList = orders;
+        notifyListeners();
+      },
+      onError: (error) {
+        debugPrint('Error in orders stream: $error');
+      },
+    );
   }
 
   Future<void> placeNewOrder({
@@ -20,11 +34,13 @@ class OrderController extends GetxController {
     required double finalAmount,
   }) async {
     try {
-      String randomOrderNo =
+      final String randomOrderNo =
           'Order No. ${Random().nextInt(900000000) + 100000000}';
-      String currentDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
+      final String currentDate = DateFormat(
+        'dd/MM/yyyy',
+      ).format(DateTime.now());
 
-      OrderModel newOrder = OrderModel(
+      final OrderModel newOrder = OrderModel(
         orderNo: randomOrderNo,
         date: currentDate,
         quantity: totalQty,
@@ -33,22 +49,15 @@ class OrderController extends GetxController {
       );
 
       await _orderService.saveOrder(newOrder);
-      Get.snackbar(
-        'Success',
-        'Order Placed Successfully',
-        colorText: Colors.white,
-        backgroundColor: Colors.green[400],
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to place order: $e',
-        colorText: Colors.white,
-        backgroundColor: Colors.red[400],
-        snackPosition: SnackPosition.TOP,
-      );
+      debugPrint('Failed to place order: $e');
       rethrow;
     }
+  }
+
+  @override
+  void dispose() {
+    _ordersSubscription?.cancel();
+    super.dispose();
   }
 }

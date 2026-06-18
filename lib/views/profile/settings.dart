@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/switch_controller.dart';
+import 'package:provider/provider.dart';
 
 class Setting extends StatelessWidget {
-  Setting({super.key});
-
-  final controller = Get.put(SwitchController());
-  final profileController = Get.isRegistered<ProfileController>()
-      ? Get.find<ProfileController>()
-      : Get.put(ProfileController());
+  const Setting({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final switchProvider = context.read<SwitchProvider>();
+    final profileProvider = context.read<ProfileProvider>();
+
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: () => Navigator.pop(context),
           child: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
@@ -34,16 +32,19 @@ class Setting extends StatelessWidget {
                 context,
                 'Personal Information',
                 hasEdit: true,
-                onEditTap: () => _showEditNameDialog(context),
+                onEditTap: () => _showEditNameDialog(context, profileProvider),
               ),
               const SizedBox(height: 10),
-              Obx(
-                () => _buildInfoCard('Name', profileController.userName.value),
+              Consumer<ProfileProvider>(
+                builder: (context, provider, child) {
+                  return _buildInfoCard('Name', provider.userName);
+                },
               ),
               const SizedBox(height: 15),
-              Obx(
-                () =>
-                    _buildInfoCard('Email', profileController.userEmail.value),
+              Consumer<ProfileProvider>(
+                builder: (context, provider, child) {
+                  return _buildInfoCard('Email', provider.userEmail);
+                },
               ),
               const SizedBox(height: 20),
               _buildSectionHeader(
@@ -57,9 +58,25 @@ class Setting extends StatelessWidget {
               const SizedBox(height: 20),
               _buildSectionHeader(context, 'Notifications'),
               const SizedBox(height: 10),
-              _buildSwitchCard('Sales', controller.switch1),
+              Consumer<SwitchProvider>(
+                builder: (context, provider, child) {
+                  return _buildSwitchCard(
+                    'Sales',
+                    provider.switch1,
+                    (value) => provider.setSwitch1(value),
+                  );
+                },
+              ),
               const SizedBox(height: 10),
-              _buildSwitchCard('New arrivals', controller.switch2),
+              Consumer<SwitchProvider>(
+                builder: (context, provider, child) {
+                  return _buildSwitchCard(
+                    'New arrivals',
+                    provider.switch2,
+                    (value) => provider.setSwitch1(value),
+                  );
+                },
+              ),
               const SizedBox(height: 10),
               _buildNavigationCard('Delivery status changes', onTap: () {}),
               const SizedBox(height: 20),
@@ -135,7 +152,11 @@ class Setting extends StatelessWidget {
     );
   }
 
-  Widget _buildSwitchCard(String title, RxBool rxValue) {
+  Widget _buildSwitchCard(
+    String title,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
     return SizedBox(
       height: 54,
       width: 335,
@@ -155,15 +176,13 @@ class Setting extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              Obx(
-                () => Switch(
-                  value: rxValue.value,
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: Colors.green,
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: Colors.grey[400],
-                  onChanged: (value) => rxValue.value = value,
-                ),
+              Switch(
+                value: value,
+                activeThumbColor: Colors.white,
+                activeTrackColor: Colors.green,
+                inactiveThumbColor: Colors.white,
+                inactiveTrackColor: Colors.grey[400],
+                onChanged: onChanged,
               ),
             ],
           ),
@@ -203,10 +222,13 @@ class Setting extends StatelessWidget {
     );
   }
 
-  void _showEditNameDialog(BuildContext context) {
+  void _showEditNameDialog(
+    BuildContext context,
+    ProfileProvider profileProvider,
+  ) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final TextEditingController nameController = TextEditingController(
-      text: profileController.userName.value,
+      text: profileProvider.userName,
     );
 
     showDialog(
@@ -228,7 +250,7 @@ class Setting extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Get.back(),
+              onPressed: () => Navigator.pop(context),
               child: const Text('CANCEL', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
@@ -237,16 +259,18 @@ class Setting extends StatelessWidget {
               ),
               onPressed: () async {
                 if (nameController.text.trim().isNotEmpty) {
-                  await profileController.updateProfile(
+                  await profileProvider.updateProfile(
+                    context,
                     nameController.text.trim(),
                   );
-                  Get.back();
+                  if (context.mounted) Navigator.pop(context);
                 } else {
-                  Get.snackbar(
-                    'Error',
-                    'Name cannot be empty',
-                    backgroundColor: Colors.red,
-                    colorText: Colors.white,
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Name cannot be empty'),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                 }
               },

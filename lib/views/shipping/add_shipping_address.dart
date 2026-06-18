@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/shipping_controller.dart';
-import 'package:new_furiniture_app_mvc/controllers/switch_controller.dart';
+import 'package:provider/provider.dart';
 
 class AddShippingAddress extends StatelessWidget {
-  AddShippingAddress({super.key});
-
-  final SwitchController switchController = Get.put(SwitchController());
-  final ShippingController shippingcontroller = Get.put(ShippingController());
+  const AddShippingAddress({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final shippingProvider = context.read<ShippingProvider>();
 
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
-          onTap: () => Get.back(),
+          onTap: () => Navigator.pop(context),
           child: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
@@ -36,14 +33,14 @@ class AddShippingAddress extends StatelessWidget {
                     _buildInputField(
                       label: 'Full Name',
                       hint: 'Ex: Danish Abrar',
-                      controller: shippingcontroller.nameController,
+                      controller: shippingProvider.nameController,
                       context: context,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
                       label: 'Address',
                       hint: 'Ex: Johar Town, Lahore',
-                      controller: shippingcontroller.addressController,
+                      controller: shippingProvider.addressController,
                       context: context,
                     ),
                     const SizedBox(height: 100),
@@ -65,22 +62,21 @@ class AddShippingAddress extends StatelessWidget {
                   backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
-                  if (shippingcontroller.nameController.text.trim().isEmpty ||
-                      shippingcontroller.addressController.text
-                          .trim()
-                          .isEmpty) {
-                    Get.snackbar(
-                      "Required",
-                      "Please fill name and address fields",
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red[400],
-                      colorText: Colors.white,
+                  if (shippingProvider.nameController.text.trim().isEmpty ||
+                      shippingProvider.addressController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          "Please fill name and address fields",
+                        ),
+                        backgroundColor: Colors.red[400],
+                      ),
                     );
                     return;
                   }
 
-                  shippingcontroller.saveShippingAddress();
-                  Get.back();
+                  shippingProvider.saveShippingAddress(context);
+                  Navigator.pop(context);
                 },
                 child: Text(
                   'SAVE ADDRESS',
@@ -98,7 +94,6 @@ class AddShippingAddress extends StatelessWidget {
     );
   }
 
-  // Reusable Adaptive Input Field Method
   Widget _buildInputField({
     required String label,
     required String hint,

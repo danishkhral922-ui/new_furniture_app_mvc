@@ -1,107 +1,116 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
 
-class HomeController extends GetxController {
+class HomeProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late Box<ProductModel> _productsBox;
 
-  var productsList = <ProductModel>[].obs;
-  var filteredProducts = <ProductModel>[].obs;
-  var isLoading = true.obs;
-  var searchQuery = ''.obs;
-  var selectedCategory = 'Popular'.obs;
+  List<ProductModel> _productsList = [];
+  List<ProductModel> _filteredProducts = [];
+  bool _isLoading = true;
+  String _searchQuery = '';
+  String _selectedCategory = 'Popular';
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+  _productsSubscription;
 
-  @override
-  void onInit() {
+  List<ProductModel> get productsList => _productsList;
+  List<ProductModel> get filteredProducts => _filteredProducts;
+  bool get isLoading => _isLoading;
+  String get searchQuery => _searchQuery;
+  String get selectedCategory => _selectedCategory;
+
+  HomeProvider() {
     _productsBox = Hive.box<ProductModel>('products_box');
     loadOfflineProducts();
     listenToProducts();
-    super.onInit();
   }
 
   void loadOfflineProducts() {
     if (_productsBox.isNotEmpty) {
-      productsList.assignAll(_productsBox.values.toList());
-      filterProducts(searchQuery.value);
-      isLoading.value = false;
+      _productsList = _productsBox.values.toList();
+      _filterProductsLogic();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   void listenToProducts() {
     try {
-      _firestore.collection('products').snapshots().listen((snapshot) {
-        List<ProductModel> temp = [];
-        for (var doc in snapshot.docs) {
-          Map<String, dynamic> data = doc.data();
-          temp.add(ProductModel.fromFirestore(doc.id, data));
-        }
+      _productsSubscription = _firestore
+          .collection('products')
+          .snapshots()
+          .listen(
+            (snapshot) async {
+              List<ProductModel> temp = [];
+              for (var doc in snapshot.docs) {
+                Map<String, dynamic> data = doc.data();
+                temp.add(ProductModel.fromFirestore(doc.id, data));
+              }
 
-        productsList.assignAll(temp);
-        filterProducts(searchQuery.value);
-        isLoading.value = false;
+              _productsList = temp;
+              _filterProductsLogic();
+              _isLoading = false;
+              notifyListeners();
 
-        _productsBox.clear().then((_) {
-          _productsBox.addAll(temp);
-        });
-      });
+              await _productsBox.clear();
+              await _productsBox.addAll(temp);
+            },
+            onError: (error) {
+              _isLoading = false;
+              notifyListeners();
+            },
+          );
     } catch (e) {
-      if (productsList.isNotEmpty) {
-        isLoading.value = false;
-        Get.snackbar(
-          'Offline Mode',
-          'Displaying cached products.',
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.orange[300],
-          colorText: Colors.white,
-        );
-      } else {
-        isLoading.value = false;
-        Get.snackbar(
-          'Error',
-          e.toString(),
-          colorText: Colors.white,
-          backgroundColor: Colors.red[400],
-          snackPosition: SnackPosition.TOP,
-        );
-      }
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   void changeCategory(String categoryName) {
-    selectedCategory.value = categoryName;
-    filterProducts(searchQuery.value);
+    _selectedCategory = categoryName;
+    _filterProductsLogic();
+    notifyListeners();
   }
 
-  void filterProducts(String query) {
-    searchQuery.value = query;
+  void updateSearchQuery(String query) {
+    _searchQuery = query;
+    _filterProductsLogic();
+    notifyListeners();
+  }
+
+  void _filterProductsLogic() {
     List<ProductModel> tempProducts = [];
 
-    if (selectedCategory.value == 'Popular') {
-      tempProducts = List.from(productsList);
+    if (_selectedCategory == 'Popular') {
+      tempProducts = List.from(_productsList);
     } else {
-      tempProducts = productsList
+      tempProducts = _productsList
           .where(
             (product) => product.name.toLowerCase().contains(
-              selectedCategory.value.toLowerCase(),
+              _selectedCategory.toLowerCase(),
             ),
           )
           .toList();
     }
 
-    if (query.isEmpty) {
-      filteredProducts.assignAll(tempProducts);
+    if (_searchQuery.isEmpty) {
+      _filteredProducts = tempProducts;
     } else {
-      filteredProducts.assignAll(
-        tempProducts
-            .where(
-              (product) =>
-                  product.name.toLowerCase().contains(query.toLowerCase()),
-            )
-            .toList(),
-      );
+      _filteredProducts = tempProducts
+          .where(
+            (product) =>
+                product.name.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
+          .toList();
     }
+  }
+
+  @override
+  void dispose() {
+    _productsSubscription?.cancel();
+    super.dispose();
   }
 }

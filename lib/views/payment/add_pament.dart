@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:new_furiniture_app_mvc/controllers/payment_controller.dart';
 
 class AddPayment extends StatelessWidget {
-  AddPayment({super.key});
-
-  final PaymentController paymentController = Get.find<PaymentController>();
+  const AddPayment({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final paymentProvider = context.read<PaymentProvider>();
 
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Get.back();
+            Navigator.pop(context);
           },
           child: const Icon(Icons.arrow_back_ios),
         ),
@@ -62,7 +61,7 @@ class AddPayment extends StatelessWidget {
                           height: 44,
                           width: 300,
                           child: TextFormField(
-                            controller: paymentController.cardHolderName,
+                            controller: paymentProvider.cardHolderName,
                             style: TextStyle(
                               color: isDarkMode ? Colors.white : Colors.black,
                             ),
@@ -114,9 +113,13 @@ class AddPayment extends StatelessWidget {
                           height: 44,
                           width: 300,
                           child: TextFormField(
-                            controller: paymentController.cardNumber,
+                            controller: paymentProvider.cardNumber,
                             keyboardType: TextInputType.number,
-                            maxLength: 16,
+                            maxLength: 19,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              CardNumberInputFormatter(),
+                            ],
                             style: TextStyle(
                               color: isDarkMode ? Colors.white : Colors.black,
                             ),
@@ -177,7 +180,7 @@ class AddPayment extends StatelessWidget {
                                 height: 44,
                                 width: 120,
                                 child: TextFormField(
-                                  controller: paymentController.cvv,
+                                  controller: paymentProvider.cvv,
                                   keyboardType: TextInputType.number,
                                   maxLength: 3,
                                   style: TextStyle(
@@ -238,7 +241,7 @@ class AddPayment extends StatelessWidget {
                                 height: 44,
                                 width: 120,
                                 child: TextFormField(
-                                  controller: paymentController.expiryDate,
+                                  controller: paymentProvider.expiryDate,
                                   keyboardType: TextInputType.number,
                                   maxLength: 5,
                                   style: TextStyle(
@@ -290,48 +293,49 @@ class AddPayment extends StatelessWidget {
                   backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
-                  if (paymentController.cardHolderName.text.trim().isEmpty) {
-                    Get.snackbar(
-                      'Error',
-                      'Please enter card holder name',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.TOP,
+                  if (paymentProvider.cardHolderName.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter card holder name'),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                     return;
                   }
-                  if (paymentController.cardNumber.text.length != 16) {
-                    Get.snackbar(
-                      'Error',
-                      'Card Number must be 16 digits',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.TOP,
+
+                  final rawCardNumber = paymentProvider.cardNumber.text
+                      .replaceAll(' ', '');
+                  if (rawCardNumber.length != 16) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Card Number must be 16 digits'),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                     return;
                   }
-                  if (paymentController.cvv.text.length != 3) {
-                    Get.snackbar(
-                      'Error',
-                      'CVV must be 3 digits',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.TOP,
+
+                  if (paymentProvider.cvv.text.length != 3) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('CVV must be 3 digits'),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                     return;
                   }
-                  if (paymentController.expiryDate.text.length != 5) {
-                    Get.snackbar(
-                      'Error',
-                      'Expiry Date format should be MM/YY',
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.TOP,
+                  if (paymentProvider.expiryDate.text.length != 5) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Expiry Date format should be MM/YY'),
+                        backgroundColor: Colors.red,
+                      ),
                     );
                     return;
                   }
-                  paymentController.savepaymentdetails();
-                  Get.back();
+
+                  paymentProvider.savePaymentDetails();
+                  Navigator.pop(context);
                 },
                 child: Text(
                   'ADD NEW CARD',
@@ -378,6 +382,35 @@ class CardExpiryInputFormatter extends TextInputFormatter {
     return TextEditingValue(
       text: formattedText,
       selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
+class CardNumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var text = newValue.text;
+
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    var buffer = StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      buffer.write(text[i]);
+      var nonZeroIndex = i + 1;
+      if (nonZeroIndex % 4 == 0 && nonZeroIndex != text.length) {
+        buffer.write(' ');
+      }
+    }
+
+    var string = buffer.toString();
+    return newValue.copyWith(
+      text: string,
+      selection: TextSelection.collapsed(offset: string.length),
     );
   }
 }

@@ -1,9 +1,12 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-class LoginController extends GetxController {
-  RxBool isHidden = true.obs;
+class LoginProvider extends ChangeNotifier {
+  bool _isHidden = true;
+
+  bool get isHidden => _isHidden;
 
   void togglePassword() {
-    isHidden.value = !isHidden.value;
+    _isHidden = !_isHidden;
+    notifyListeners();
   }
 }

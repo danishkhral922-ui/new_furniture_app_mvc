@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../models/shipping_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class ShippingController extends GetxController {
+class ShippingProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Box<ShippingModel> _shippingBox = Hive.box<ShippingModel>(
     'shipping_box',
@@ -16,22 +15,34 @@ class ShippingController extends GetxController {
   final editNameController = TextEditingController();
   final editAddressController = TextEditingController();
 
-  var fullname = ''.obs;
-  var address = ''.obs;
+  String fullname = '';
+  String address = '';
 
-  var shippingAddresses = <ShippingModel>[].obs;
-  var selectedAddressIndex = 0.obs;
-  var currentShipping = Rxn<ShippingModel>();
+  List<ShippingModel> shippingAddresses = [];
+  int selectedAddressIndex = 0;
+  ShippingModel? currentShipping;
 
-  @override
-  void onInit() {
-    super.onInit();
+  ShippingProvider() {
     if (_shippingBox.isNotEmpty) {
-      shippingAddresses.assignAll(_shippingBox.values.toList());
+      shippingAddresses = _shippingBox.values.toList();
       selectAddress(0);
     }
-
     fetchCurrentAddress();
+  }
+
+  void _showSnackBar(
+    BuildContext context,
+    String title,
+    String message,
+    Color bgColor,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$title: $message'),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   void fetchCurrentAddress() async {
@@ -44,7 +55,7 @@ class ShippingController extends GetxController {
         shippingAddresses.clear();
         for (var doc in querySnapshot.docs) {
           if (doc.data() != null) {
-            shippingAddresses.add(ShippingModel.fromMap(doc.data()!));
+            shippingAddresses.add(ShippingModel.fromMap(doc.data()));
           }
         }
         await _shippingBox.clear();
@@ -53,21 +64,16 @@ class ShippingController extends GetxController {
         if (shippingAddresses.isNotEmpty) {
           selectAddress(0);
         }
+        notifyListeners();
       }
     } catch (e) {
       debugPrint("Error fetching address: $e");
     }
   }
 
-  Future<void> saveShippingAddress() async {
+  Future<void> saveShippingAddress(BuildContext context) async {
     if (nameController.text.isEmpty || addressController.text.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please fill all fields',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      _showSnackBar(context, 'Error', 'Please fill all fields', Colors.red);
       return;
     }
 
@@ -83,7 +89,9 @@ class ShippingController extends GetxController {
       nameController.clear();
       addressController.clear();
 
-      Get.back();
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
 
       String docId = _firestore.collection('shipping_addresses').doc().id;
 
@@ -93,40 +101,35 @@ class ShippingController extends GetxController {
           .set(newAddress.toMap());
 
       shippingAddresses.add(newAddress);
-
       selectAddress(shippingAddresses.length - 1);
 
       nameController.clear();
       addressController.clear();
 
-      Get.back();
-      Get.snackbar(
-        'Success',
-        'Address updated successfully',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        Navigator.pop(context);
+        _showSnackBar(
+          context,
+          'Success',
+          'Address updated successfully',
+          Colors.green,
+        );
+      }
+      notifyListeners();
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to save address',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        _showSnackBar(context, 'Error', 'Failed to save address', Colors.red);
+      }
     }
   }
 
-  Future<void> updateExistingAddress(int index, String oldFullName) async {
+  Future<void> updateExistingAddress(
+    BuildContext context,
+    int index,
+    String oldFullName,
+  ) async {
     if (editNameController.text.isEmpty || editAddressController.text.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Fields cannot be empty',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      _showSnackBar(context, 'Error', 'Fields cannot be empty', Colors.red);
       return;
     }
 
@@ -138,10 +141,13 @@ class ShippingController extends GetxController {
       await _shippingBox.putAt(index, updatedAddress);
       shippingAddresses[index] = updatedAddress;
 
-      if (selectedAddressIndex.value == index) {
-        currentShipping.value = updatedAddress;
+      if (selectedAddressIndex == index) {
+        currentShipping = updatedAddress;
       }
-      Get.back();
+
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
 
       var querySnapshot = await _firestore
           .collection('shipping_addresses')
@@ -157,44 +163,42 @@ class ShippingController extends GetxController {
 
         shippingAddresses[index] = updatedAddress;
 
-        if (selectedAddressIndex.value == index) {
-          currentShipping.value = updatedAddress;
+        if (selectedAddressIndex == index) {
+          currentShipping = updatedAddress;
         }
 
-        Get.back();
-        Get.snackbar(
-          'Success',
-          'Address updated successfully',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
-        );
+        if (context.mounted) {
+          Navigator.pop(context);
+          _showSnackBar(
+            context,
+            'Success',
+            'Address updated successfully',
+            Colors.green,
+          );
+        }
+        notifyListeners();
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to update address',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        _showSnackBar(context, 'Error', 'Failed to update address', Colors.red);
+      }
     }
   }
 
   void selectAddress(int index) {
     if (index >= 0 && index < shippingAddresses.length) {
-      selectedAddressIndex.value = index;
-      currentShipping.value = shippingAddresses[index];
-      shippingAddresses.refresh();
+      selectedAddressIndex = index;
+      currentShipping = shippingAddresses[index];
+      notifyListeners();
     }
   }
 
   @override
-  void onClose() {
+  void dispose() {
     nameController.dispose();
     addressController.dispose();
     editNameController.dispose();
     editAddressController.dispose();
-    super.onClose();
+    super.dispose();
   }
 }

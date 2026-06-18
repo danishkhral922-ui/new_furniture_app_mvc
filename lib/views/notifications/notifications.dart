@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/controllers/notification_controller.dart';
+import 'package:provider/provider.dart';
 
 class NotificationsScreen extends StatelessWidget {
-  NotificationsScreen({super.key});
-
-  final NotificationController controller = Get.put(NotificationController());
+  const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,56 +16,64 @@ class NotificationsScreen extends StatelessWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: Theme.of(context).iconTheme.color,
-            ),
-          );
-        }
-
-        if (controller.notificationList.isEmpty) {
-          return const Center(
-            child: Text(
-              'No new notifications available',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          );
-        }
-
-        return ListView.builder(
-          itemCount: controller.notificationList.length,
-          itemBuilder: (context, index) {
-            final notification = controller.notificationList[index];
-
-            return Dismissible(
-              key: Key(notification.id.toString()),
-              direction: DismissDirection.endToStart,
-              background: Container(
-                color: Colors.red,
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: const Icon(Icons.delete, color: Colors.white),
-              ),
-              confirmDismiss: (direction) async {
-                await controller.removeNotification(index, notification.id);
-                return true;
-              },
-              child: GestureDetector(
-                onTap: () =>
-                    controller.MarkNotificationAsread(index, notification.id),
-                child: NotificationTile(
-                  title: notification.title,
-                  description: notification.description,
-                  isRead: notification.isRead,
-                  imageUrl: notification.imageUrl,
-                ),
+      body: Consumer<NotificationProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).iconTheme.color,
               ),
             );
-          },
-        );
-      }),
+          }
+
+          if (provider.notificationList.isEmpty) {
+            return const Center(
+              child: Text(
+                'No new notifications available',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: provider.notificationList.length,
+            itemBuilder: (context, index) {
+              final notification = provider.notificationList[index];
+
+              return Dismissible(
+                key: Key(notification.id.toString()),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                confirmDismiss: (direction) async {
+                  final success = await context
+                      .read<NotificationProvider>()
+                      .removeNotification(index, notification.id);
+                  return success;
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    context.read<NotificationProvider>().markNotificationAsRead(
+                      index,
+                      notification.id,
+                    );
+                  },
+                  child: NotificationTile(
+                    title: notification.title,
+                    description: notification.description,
+                    isRead: notification.isRead,
+                    imageUrl: notification.imageUrl,
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

@@ -1,97 +1,76 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/models/notification_model.dart';
 import 'package:new_furiniture_app_mvc/services/notification_services.dart';
 
-class NotificationController extends GetxController {
+class NotificationProvider extends ChangeNotifier {
   final NotificationService _notificationService = NotificationService();
 
-  var notificationList = <NotificationModel>[].obs;
-  var isLoading = true.obs;
+  List<NotificationModel> _notificationList = [];
+  bool _isLoading = true;
 
-  @override
-  void onInit() {
-    super.onInit();
+  NotificationProvider() {
     fetchNotifications();
   }
 
+  List<NotificationModel> get notificationList => _notificationList;
+  bool get isLoading => _isLoading;
+
   Future<void> fetchNotifications() async {
     try {
-      isLoading.value = true;
+      _isLoading = true;
+      notifyListeners();
 
-      var rawData = await _notificationService.fetchNotifications();
-      var convertedNotifications = rawData
+      final rawData = await _notificationService.fetchNotifications();
+      _notificationList = rawData
           .map((json) => NotificationModel.fromJson(json))
           .toList();
-
-      notificationList.assignAll(convertedNotifications);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Notifications Screen is not Load: $e',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      debugPrint('Error loading notifications: $e');
     } finally {
-      isLoading.value = false;
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
-  Future<void> MarkNotificationAsread(int index, int id) async {
+  Future<bool> markNotificationAsRead(int index, int id) async {
     try {
-      var Updatedata = await _notificationService.updatenotificationstatus(
+      final updateData = await _notificationService.updatenotificationstatus(
         id,
         true,
       );
-      NotificationModel olditem = notificationList[index];
-      notificationList[index] = NotificationModel(
-        id: olditem.id,
-        title: Updatedata['title'] ?? olditem.title,
-        description: 'Status successsfully Updated via PUT APi',
-        imageUrl: olditem.imageUrl,
+
+      final oldItem = _notificationList[index];
+      _notificationList[index] = NotificationModel(
+        id: oldItem.id,
+        title: updateData['title'] ?? oldItem.title,
+        description: 'Status successfully Updated via PUT API',
+        imageUrl: oldItem.imageUrl,
         isRead: true,
       );
-      Get.snackbar(
-        'PUT Success',
-        '  Notification ID:$id marked as read on server',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+
+      notifyListeners();
+      return true;
     } catch (e) {
-      Get.snackbar(
-        'PUT Error',
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      debugPrint('Error updating notification status: $e');
+      return false;
     }
   }
 
-  Future<void> removeNotification(int index, int id) async {
+  Future<bool> removeNotification(int index, int id) async {
     try {
-      bool isDeleted = await _notificationService.deleteNotificationfromserver(
+      final isDeleted = await _notificationService.deleteNotificationfromserver(
         id,
       );
 
       if (isDeleted) {
-        notificationList.removeAt(index);
-        Get.snackbar(
-          'Notification',
-          'Notification ID:$id permanently deleted from server',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
-        );
+        _notificationList.removeAt(index);
+        notifyListeners();
+        return true;
       }
+      return false;
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      debugPrint('Error deleting notification: $e');
+      return false;
     }
   }
 }

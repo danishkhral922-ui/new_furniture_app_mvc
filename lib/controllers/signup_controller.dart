@@ -1,15 +1,16 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-class SignupController extends GetxController {
-  RxBool passwordHidden = true.obs;
-
-  RxBool confirmPasswordHidden = true.obs;
+class SignupProvider extends ChangeNotifier {
+  bool passwordHidden = true;
+  bool confirmPasswordHidden = true;
 
   void togglePassword() {
-    passwordHidden.value = !passwordHidden.value;
+    passwordHidden = !passwordHidden;
+    notifyListeners();
   }
 
   void toggleConfirmPassword() {
-    confirmPasswordHidden.value = !confirmPasswordHidden.value;
+    confirmPasswordHidden = !confirmPasswordHidden;
+    notifyListeners();
   }
 }

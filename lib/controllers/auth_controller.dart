@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:new_furiniture_app_mvc/views/home/home.dart';
 
-class AuthController extends GetxController {
+class AuthProvider extends ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -13,18 +12,33 @@ class AuthController extends GetxController {
   TextEditingController nameController = TextEditingController();
   TextEditingController confirmpasswordController = TextEditingController();
 
-  Future<void> signUp() async {
+  void _showSnackBar(
+    BuildContext context,
+    String title,
+    String message,
+    Color bgColor,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$title: $message'),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> signUp(BuildContext context) async {
     if (passwordController.text.trim() !=
         confirmpasswordController.text.trim()) {
-      Get.snackbar(
+      _showSnackBar(
+        context,
         'Error',
-        'Passwords do no match',
-        backgroundColor: Colors.red[400],
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
+        'Passwords do not match',
+        Colors.red[400]!,
       );
       return;
     }
+
     try {
       User? user = (await auth.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -38,68 +52,58 @@ class AuthController extends GetxController {
           'uid': user.uid,
         });
 
-        Get.snackbar(
+        _showSnackBar(
+          context,
           'Success',
           'Account Created Successfully',
-          backgroundColor: Colors.green[400],
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
+          Colors.green[400]!,
         );
       }
     } on FirebaseAuthException catch (e) {
-      Get.snackbar(
+      _showSnackBar(
+        context,
         'Error',
         e.message ?? 'Something went wrong',
-        backgroundColor: Colors.red[400],
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
+        Colors.red[400]!,
       );
     }
   }
 
-  Future<void> login() async {
+  Future<void> login(BuildContext context) async {
     try {
       await auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      Get.snackbar(
-        'Success',
-        'Login Successful',
-        backgroundColor: Colors.green[400],
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
+      _showSnackBar(context, 'Success', 'Login Successful', Colors.green[400]!);
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Home()),
+        (route) => false,
       );
-      Get.offAll(Home());
     } on FirebaseAuthException catch (e) {
-      Get.snackbar(
+      _showSnackBar(
+        context,
         'Error',
         e.message ?? 'Something went wrong',
-        backgroundColor: Colors.red[400],
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
+        Colors.red[400]!,
       );
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     await auth.signOut();
-    Get.snackbar(
-      'Logout',
-      'User Logged Out',
-      backgroundColor: Colors.orange[400],
-      colorText: Colors.white,
-      snackPosition: SnackPosition.TOP,
-    );
+    _showSnackBar(context, 'Logout', 'User Logged Out', Colors.orange[400]!);
   }
 
   @override
-  void onClose() {
+  void dispose() {
     emailController.dispose();
     passwordController.dispose();
     nameController.dispose();
     confirmpasswordController.dispose();
-    super.onClose();
+    super.dispose();
   }
 }

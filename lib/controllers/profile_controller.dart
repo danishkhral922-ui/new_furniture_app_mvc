@@ -1,66 +1,69 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-class ProfileController extends GetxController {
+class ProfileProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  var userName = 'Loading...'.obs;
-  var userEmail = 'Loading...'.obs;
+  String userName = 'Loading...';
+  String userEmail = 'Loading...';
 
-  @override
-  void onInit() {
-    super.onInit();
+  ProfileProvider() {
     fetchUserData();
   }
 
   void fetchUserData() {
     String? uid = _auth.currentUser?.uid;
     if (uid != null) {
-      userEmail.value = _auth.currentUser?.email ?? 'No Email';
+      userEmail = _auth.currentUser?.email ?? 'No Email';
 
       _firestore.collection('users').doc(uid).snapshots().listen((snapshot) {
         if (snapshot.exists && snapshot.data() != null) {
-          userName.value = snapshot.data()?['name'] ?? 'No Name';
+          userName = snapshot.data()?['name'] ?? 'No Name';
         } else {
-          userName.value = _auth.currentUser?.displayName ?? 'User';
+          userName = _auth.currentUser?.displayName ?? 'User';
         }
+        notifyListeners();
       }, onError: (error) {});
     }
   }
 
-  Future<void> updateProfile(String newName) async {
+  Future<void> updateProfile(BuildContext context, String newName) async {
     try {
       String? uid = _auth.currentUser?.uid;
       if (uid != null) {
         await _firestore.collection('users').doc(uid).set({
           'name': newName,
-          'email': userEmail.value,
+          'email': userEmail,
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
 
         await _auth.currentUser?.updateDisplayName(newName);
 
-        userName.value = newName;
+        userName = newName;
+        notifyListeners();
 
-        Get.snackbar(
-          'Success',
-          'Profile updated successfully!',
-          colorText: Colors.white,
-          backgroundColor: Colors.green,
-          snackPosition: SnackPosition.TOP,
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Success: Profile updated successfully!'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to save data: $e',
-        colorText: Colors.white,
-        backgroundColor: Colors.red,
-        snackPosition: SnackPosition.TOP,
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: Failed to save data: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }
