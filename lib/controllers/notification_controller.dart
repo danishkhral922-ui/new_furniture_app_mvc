@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/models/notification_model.dart';
@@ -60,6 +62,33 @@ class NotificationController extends GetxController {
     } catch (e) {
       Get.snackbar(
         'PUT Error',
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+  }
+
+  Future<void> removeNotification(int index, int id) async {
+    try {
+      bool isDeleted = await _notificationService.deleteNotificationfromserver(
+        id,
+      );
+
+      if (isDeleted) {
+        notificationList.removeAt(index);
+        Get.snackbar(
+          'Notification',
+          'Notification ID:$id permanently deleted from server',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,

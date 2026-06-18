@@ -46,14 +46,30 @@ class NotificationsScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final notification = controller.notificationList[index];
 
-            return GestureDetector(
-              onTap: () =>
-                  controller.MarkNotificationAsread(index, notification.id),
-              child: NotificationTile(
-                title: notification.title,
-                description: notification.description,
-                isRead: notification.isRead,
-                imageUrl: notification.imageUrl,
+            return Dismissible(
+              key: Key(notification.id.toString()),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                color: Colors.red,
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: const Icon(Icons.delete, color: Colors.white),
+              ),
+
+              confirmDismiss: (direction) async {
+                await controller.removeNotification(index, notification.id);
+
+                return true;
+              },
+              child: GestureDetector(
+                onTap: () =>
+                    controller.MarkNotificationAsread(index, notification.id),
+                child: NotificationTile(
+                  title: notification.title,
+                  description: notification.description,
+                  isRead: notification.isRead,
+                  imageUrl: notification.imageUrl,
+                ),
               ),
             );
           },

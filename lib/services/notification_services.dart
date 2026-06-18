@@ -39,4 +39,17 @@ class NotificationService {
       throw Exception('Notification PUT API Fail');
     }
   }
+
+  Future<bool> deleteNotificationfromserver(int id) async {
+    try {
+      Response response = await _dio.delete('$_baseUrl/products/$id');
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      throw Exception("Notification API Fail :$e");
+    }
+  }
 }
