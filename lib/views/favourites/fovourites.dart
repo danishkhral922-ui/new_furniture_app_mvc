@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/cart_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/favourite_controller.dart';
-import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
 import 'package:get/get.dart';
+import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
 
 class Favourite extends StatelessWidget {
   Favourite({super.key});
@@ -14,11 +14,10 @@ class Favourite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: const Icon(Icons.search),
         title: const Text(
           'Favourite',
@@ -32,7 +31,10 @@ class Favourite extends StatelessWidget {
               onTap: () {
                 Get.to(Cart());
               },
-              child: Image.asset('assets/images/cart.png'),
+              child: Image.asset(
+                'assets/images/cart.png',
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
           ),
         ],
@@ -40,8 +42,10 @@ class Favourite extends StatelessWidget {
       body: Obx(() {
         if (favouriteController.isLoading.value &&
             favouriteController.favouriteItems.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.black),
+          return Center(
+            child: CircularProgressIndicator(
+              color: Theme.of(context).iconTheme.color,
+            ),
           );
         }
 
@@ -107,7 +111,7 @@ class Favourite extends StatelessWidget {
                           },
                           child: Image.asset(
                             'assets/images/cancel.png',
-                            color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                         const SizedBox(height: 30),
@@ -125,14 +129,20 @@ class Favourite extends StatelessWidget {
                               colorText: Colors.white,
                             );
                           },
-                          child: Image.asset('assets/images/shoppingbag.png'),
+                          child: Image.asset(
+                            'assets/images/shoppingbag.png',
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                Divider(color: Colors.grey[200], thickness: 2),
+                Divider(
+                  color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                  thickness: 2,
+                ),
                 const SizedBox(height: 10),
               ],
             );
@@ -144,7 +154,7 @@ class Favourite extends StatelessWidget {
         height: 50,
         width: 334,
         child: FloatingActionButton(
-          backgroundColor: Colors.black,
+          backgroundColor: isDarkMode ? Colors.white : Colors.black,
           onPressed: () async {
             if (favouriteController.favouriteItems.isEmpty) return;
 
@@ -166,10 +176,10 @@ class Favourite extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Text(
+          child: Text(
             'Add all to my Cart',
             style: TextStyle(
-              color: Colors.white,
+              color: isDarkMode ? Colors.black : Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),

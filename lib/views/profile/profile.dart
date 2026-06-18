@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
 import 'package:new_furiniture_app_mvc/views/auth/auth_wrapper.dart';
 import 'package:new_furiniture_app_mvc/views/orders/orders.dart';
 import 'package:new_furiniture_app_mvc/views/payment/payment_method.dart';
@@ -18,11 +18,10 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: const Icon(Icons.search),
         centerTitle: true,
         title: const Text(
@@ -40,7 +39,7 @@ class Profile extends StatelessWidget {
               },
               child: Image.asset(
                 'assets/images/forward.png',
-                color: Colors.black,
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
             ),
           ),
@@ -132,7 +131,6 @@ class Profile extends StatelessWidget {
         height: 80,
         width: 335,
         child: Card(
-          color: Colors.white,
           shadowColor: Colors.grey.withAlpha(60),
           elevation: 8,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -150,7 +148,6 @@ class Profile extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 18,
-                        color: Colors.black,
                       ),
                     ),
                     Text(
@@ -163,11 +160,7 @@ class Profile extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 18,
-                  color: Colors.black,
-                ),
+                const Icon(Icons.arrow_forward_ios, size: 18),
               ],
             ),
           ),

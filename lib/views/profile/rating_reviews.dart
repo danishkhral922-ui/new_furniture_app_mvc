@@ -7,11 +7,10 @@ class RatingReviews extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
@@ -31,37 +30,34 @@ class RatingReviews extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/minimalstand2.png'),
                   const SizedBox(width: 16),
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Minimal Stand',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          color: Colors.black,
                         ),
                       ),
                       Row(
                         children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 24),
-                          const SizedBox(width: 4),
-                          const Text(
+                          Icon(Icons.star, color: Colors.amber, size: 24),
+                          SizedBox(width: 4),
+                          Text(
                             '4.5',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black,
                             ),
                           ),
                         ],
                       ),
-                      const Text(
+                      Text(
                         '10 Reviews',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -69,7 +65,7 @@ class RatingReviews extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Divider(color: Colors.grey[200]),
+              Divider(color: isDarkMode ? Colors.grey[800] : Colors.grey[200]),
               const SizedBox(height: 30),
               _buildReviewCard(
                 name: 'Bruno Fernandes',
@@ -104,15 +100,15 @@ class RatingReviews extends StatelessWidget {
         height: 50,
         width: 334,
         child: FloatingActionButton(
-          backgroundColor: Colors.black,
+          backgroundColor: isDarkMode ? Colors.white : Colors.black,
           onPressed: () => Get.to(() => const MyReviews()),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Text(
+          child: Text(
             'Write a Review',
             style: TextStyle(
-              color: Colors.white,
+              color: isDarkMode ? Colors.black : Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -136,7 +132,6 @@ class RatingReviews extends StatelessWidget {
           child: Card(
             elevation: 8,
             shadowColor: Colors.grey.withAlpha(60),
-            color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -158,7 +153,6 @@ class RatingReviews extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
                         ),
                       ),
                       Text(

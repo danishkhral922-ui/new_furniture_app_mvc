@@ -9,22 +9,17 @@ class OrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
         ),
         title: const Text(
           'My Orders',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
         ),
         centerTitle: true,
       ),
@@ -49,7 +44,6 @@ class OrderScreen extends StatelessWidget {
             final order = orderController.ordersList[index];
             return Card(
               elevation: 4,
-              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -60,10 +54,10 @@ class OrderScreen extends StatelessWidget {
                       children: [
                         Text(
                           order.orderNo,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
-                            color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                         Text(
@@ -88,10 +82,10 @@ class OrderScreen extends StatelessWidget {
                         ),
                         Text(
                           'Total: \$${order.totalAmount}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
-                            color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                       ],

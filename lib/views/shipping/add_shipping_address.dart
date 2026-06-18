@@ -11,11 +11,10 @@ class AddShippingAddress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
@@ -23,11 +22,7 @@ class AddShippingAddress extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Add shipping address',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
@@ -42,12 +37,14 @@ class AddShippingAddress extends StatelessWidget {
                       label: 'Full Name',
                       hint: 'Ex: Danish Abrar',
                       controller: shippingcontroller.nameController,
+                      context: context,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
                       label: 'Address',
                       hint: 'Ex: Johar Town, Lahore',
                       controller: shippingcontroller.addressController,
+                      context: context,
                     ),
                     const SizedBox(height: 100),
                   ],
@@ -65,7 +62,7 @@ class AddShippingAddress extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
                   if (shippingcontroller.nameController.text.trim().isEmpty ||
@@ -83,15 +80,14 @@ class AddShippingAddress extends StatelessWidget {
                   }
 
                   shippingcontroller.saveShippingAddress();
-
                   Get.back();
                 },
-                child: const Text(
+                child: Text(
                   'SAVE ADDRESS',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ),
@@ -102,20 +98,30 @@ class AddShippingAddress extends StatelessWidget {
     );
   }
 
+  // Reusable Adaptive Input Field Method
   Widget _buildInputField({
     required String label,
     required String hint,
     required TextEditingController controller,
+    required BuildContext context,
     IconData? suffixIcon,
     bool isWhiteBg = false,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: 335,
       height: 80,
       decoration: BoxDecoration(
-        border: isWhiteBg ? Border.all(color: Colors.grey[300]!) : null,
+        border: isWhiteBg
+            ? Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+              )
+            : null,
         borderRadius: BorderRadius.circular(8),
-        color: isWhiteBg ? Colors.white : Colors.grey[100],
+        color: isWhiteBg
+            ? (isDarkMode ? Colors.grey[850] : Colors.white)
+            : (isDarkMode ? Colors.grey[900] : Colors.grey[100]),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,13 +142,15 @@ class AddShippingAddress extends StatelessWidget {
             width: 300,
             child: TextFormField(
               controller: controller,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
               decoration: InputDecoration(
-                suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+                suffixIcon: suffixIcon != null
+                    ? Icon(suffixIcon, color: Colors.grey)
+                    : null,
                 border: const OutlineInputBorder(borderSide: BorderSide.none),
                 hintText: hint,
                 hintStyle: const TextStyle(

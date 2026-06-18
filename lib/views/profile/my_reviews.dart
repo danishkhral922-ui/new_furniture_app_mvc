@@ -7,10 +7,7 @@ class MyReviews extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
@@ -18,11 +15,7 @@ class MyReviews extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'My Reviews',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
       body: SingleChildScrollView(
@@ -78,7 +71,6 @@ class MyReviews extends StatelessWidget {
     return Card(
       elevation: 4,
       shadowColor: Colors.black12,
-      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -97,7 +89,6 @@ class MyReviews extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +107,6 @@ class MyReviews extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -125,7 +115,6 @@ class MyReviews extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -152,14 +141,12 @@ class MyReviews extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            // Review Text
             Text(
               reviewText,
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: Colors.black87,
-                height: 1.4, // Line spacing behtar karne ke liye
+                height: 1.4,
               ),
             ),
           ],

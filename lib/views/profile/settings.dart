@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:new_furiniture_app_mvc/controllers/switch_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/profile_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/switch_controller.dart';
 
 class Setting extends StatelessWidget {
   Setting({super.key});
@@ -14,10 +14,7 @@ class Setting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
@@ -25,11 +22,7 @@ class Setting extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Settings',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
       body: SingleChildScrollView(
@@ -38,6 +31,7 @@ class Setting extends StatelessWidget {
           child: Column(
             children: [
               _buildSectionHeader(
+                context,
                 'Personal Information',
                 hasEdit: true,
                 onEditTap: () => _showEditNameDialog(context),
@@ -52,11 +46,16 @@ class Setting extends StatelessWidget {
                     _buildInfoCard('Email', profileController.userEmail.value),
               ),
               const SizedBox(height: 20),
-              _buildSectionHeader('Password', hasEdit: true, onEditTap: () {}),
+              _buildSectionHeader(
+                context,
+                'Password',
+                hasEdit: true,
+                onEditTap: () {},
+              ),
               const SizedBox(height: 10),
               _buildInfoCard('Password', '***************'),
               const SizedBox(height: 20),
-              _buildSectionHeader('Notifications'),
+              _buildSectionHeader(context, 'Notifications'),
               const SizedBox(height: 10),
               _buildSwitchCard('Sales', controller.switch1),
               const SizedBox(height: 10),
@@ -64,7 +63,7 @@ class Setting extends StatelessWidget {
               const SizedBox(height: 10),
               _buildNavigationCard('Delivery status changes', onTap: () {}),
               const SizedBox(height: 20),
-              _buildSectionHeader('Help Center'),
+              _buildSectionHeader(context, 'Help Center'),
               const SizedBox(height: 10),
               _buildNavigationCard('FAQ', onTap: () {}),
             ],
@@ -75,6 +74,7 @@ class Setting extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(
+    BuildContext context,
     String title, {
     bool hasEdit = false,
     VoidCallback? onEditTap,
@@ -104,7 +104,6 @@ class Setting extends StatelessWidget {
       height: 64,
       width: 335,
       child: Card(
-        color: Colors.white,
         shadowColor: Colors.grey.withAlpha(60),
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -127,7 +126,6 @@ class Setting extends StatelessWidget {
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
-                  color: Colors.black,
                 ),
               ),
             ],
@@ -142,7 +140,6 @@ class Setting extends StatelessWidget {
       height: 54,
       width: 335,
       child: Card(
-        color: Colors.white,
         shadowColor: Colors.grey.withAlpha(60),
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -156,7 +153,6 @@ class Setting extends StatelessWidget {
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
-                  color: Colors.black,
                 ),
               ),
               Obx(
@@ -183,7 +179,6 @@ class Setting extends StatelessWidget {
         height: 54,
         width: 335,
         child: Card(
-          color: Colors.white,
           shadowColor: Colors.grey.withAlpha(60),
           elevation: 4,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -197,14 +192,9 @@ class Setting extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
-                    color: Colors.black,
                   ),
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 18,
-                  color: Colors.black,
-                ),
+                const Icon(Icons.arrow_forward_ios, size: 18),
               ],
             ),
           ),
@@ -214,6 +204,7 @@ class Setting extends StatelessWidget {
   }
 
   void _showEditNameDialog(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final TextEditingController nameController = TextEditingController(
       text: profileController.userName.value,
     );
@@ -222,7 +213,6 @@ class Setting extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
           title: const Text(
             'Edit Name',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -242,7 +232,9 @@ class Setting extends StatelessWidget {
               child: const Text('CANCEL', style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDarkMode ? Colors.white : Colors.black,
+              ),
               onPressed: () async {
                 if (nameController.text.trim().isNotEmpty) {
                   await profileController.updateProfile(
@@ -258,7 +250,12 @@ class Setting extends StatelessWidget {
                   );
                 }
               },
-              child: const Text('SAVE', style: TextStyle(color: Colors.white)),
+              child: Text(
+                'SAVE',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.black : Colors.white,
+                ),
+              ),
             ),
           ],
         );

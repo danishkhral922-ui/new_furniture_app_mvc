@@ -10,11 +10,10 @@ class AddPayment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () {
             Get.back();
@@ -24,11 +23,7 @@ class AddPayment extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Add payment method',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
       body: Column(
@@ -44,7 +39,7 @@ class AddPayment extends StatelessWidget {
                     height: 80,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey[100],
+                      color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,6 +63,9 @@ class AddPayment extends StatelessWidget {
                           width: 300,
                           child: TextFormField(
                             controller: paymentController.cardHolderName,
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(
                                 borderSide: BorderSide.none,
@@ -89,9 +87,11 @@ class AddPayment extends StatelessWidget {
                     width: 335,
                     height: 80,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(
+                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                      ),
                       borderRadius: BorderRadius.circular(8),
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.transparent : Colors.white,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,16 +117,21 @@ class AddPayment extends StatelessWidget {
                             controller: paymentController.cardNumber,
                             keyboardType: TextInputType.number,
                             maxLength: 16,
-                            decoration: const InputDecoration(
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                            decoration: InputDecoration(
                               counterText: '',
-                              border: OutlineInputBorder(
+                              border: const OutlineInputBorder(
                                 borderSide: BorderSide.none,
                               ),
                               hintText: '**** **** **** 3456',
                               hintStyle: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: isDarkMode
+                                    ? Colors.grey[600]
+                                    : Colors.black45,
                               ),
                             ),
                           ),
@@ -147,7 +152,9 @@ class AddPayment extends StatelessWidget {
                           height: 80,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.grey[100],
+                            color: isDarkMode
+                                ? Colors.grey[900]
+                                : Colors.grey[100],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,6 +180,11 @@ class AddPayment extends StatelessWidget {
                                   controller: paymentController.cvv,
                                   keyboardType: TextInputType.number,
                                   maxLength: 3,
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                   decoration: const InputDecoration(
                                     counterText: '',
                                     border: OutlineInputBorder(
@@ -195,9 +207,15 @@ class AddPayment extends StatelessWidget {
                           width: 150,
                           height: 80,
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
+                            border: Border.all(
+                              color: isDarkMode
+                                  ? Colors.grey[700]!
+                                  : Colors.grey,
+                            ),
                             borderRadius: BorderRadius.circular(8),
-                            color: Colors.white,
+                            color: isDarkMode
+                                ? Colors.transparent
+                                : Colors.white,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,20 +241,27 @@ class AddPayment extends StatelessWidget {
                                   controller: paymentController.expiryDate,
                                   keyboardType: TextInputType.number,
                                   maxLength: 5,
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly,
                                     CardExpiryInputFormatter(),
                                   ],
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     counterText: '',
-                                    border: OutlineInputBorder(
+                                    border: const OutlineInputBorder(
                                       borderSide: BorderSide.none,
                                     ),
                                     hintText: '03/22',
                                     hintStyle: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
-                                      color: Colors.black,
+                                      color: isDarkMode
+                                          ? Colors.grey[600]
+                                          : Colors.black45,
                                     ),
                                   ),
                                 ),
@@ -262,7 +287,7 @@ class AddPayment extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
                   if (paymentController.cardHolderName.text.trim().isEmpty) {
@@ -295,7 +320,7 @@ class AddPayment extends StatelessWidget {
                     );
                     return;
                   }
-                  if (paymentController.expiryDate.text.length != 4) {
+                  if (paymentController.expiryDate.text.length != 5) {
                     Get.snackbar(
                       'Error',
                       'Expiry Date format should be MM/YY',
@@ -306,15 +331,14 @@ class AddPayment extends StatelessWidget {
                     return;
                   }
                   paymentController.savepaymentdetails();
-
                   Get.back();
                 },
-                child: const Text(
+                child: Text(
                   'ADD NEW CARD',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ),

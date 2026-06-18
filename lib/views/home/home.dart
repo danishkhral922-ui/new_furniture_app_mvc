@@ -4,6 +4,8 @@ import 'package:new_furiniture_app_mvc/controllers/bottomnav_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/product_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/home_controller.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:new_furiniture_app_mvc/controllers/theme_provider.dart';
 import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
 import 'package:new_furiniture_app_mvc/views/favourites/fovourites.dart';
 import 'package:new_furiniture_app_mvc/views/notifications/notifications.dart';
@@ -25,79 +27,100 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> screens = [
-      homeContent(),
-      Favourite(),
-      NotificationsScreen(),
-      Profile(),
-    ];
+    return Consumer<AppthemeProvider>(
+      builder: (context, themeProvider, child) {
+        final List<Widget> screens = [
+          homeContent(context),
+          Favourite(),
+          NotificationsScreen(),
+          Profile(),
+        ];
 
-    return Obx(
-      () => Scaffold(
-        body: screens[controller.currentIndex.value],
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          currentIndex: controller.currentIndex.value,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.grey,
-          onTap: (index) {
-            controller.currentIndex.value = index;
-          },
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(
-                controller.currentIndex.value == 0
-                    ? Icons.home
-                    : Icons.home_outlined,
-              ),
-              label: '',
+        return Obx(
+          () => Scaffold(
+            body: screens[controller.currentIndex.value],
+            bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: themeProvider.islightMode
+                  ? Colors.white
+                  : Colors.grey[900],
+              showSelectedLabels: false,
+              showUnselectedLabels: false,
+              currentIndex: controller.currentIndex.value,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: themeProvider.islightMode
+                  ? Colors.black
+                  : Colors.white,
+              unselectedItemColor: Colors.grey,
+              onTap: (index) {
+                controller.currentIndex.value = index;
+              },
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    controller.currentIndex.value == 0
+                        ? Icons.home
+                        : Icons.home_outlined,
+                  ),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    controller.currentIndex.value == 1
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                  ),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    controller.currentIndex.value == 2
+                        ? Icons.notifications
+                        : Icons.notifications_none,
+                  ),
+                  label: '',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    controller.currentIndex.value == 3
+                        ? Icons.person
+                        : Icons.person_outline,
+                  ),
+                  label: '',
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                controller.currentIndex.value == 1
-                    ? Icons.favorite
-                    : Icons.favorite_border,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                controller.currentIndex.value == 2
-                    ? Icons.notifications
-                    : Icons.notifications_none,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                controller.currentIndex.value == 3
-                    ? Icons.person
-                    : Icons.person_outline,
-              ),
-              label: '',
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget homeContent() {
+  Widget homeContent(BuildContext context) {
+    final themeProvider = Provider.of<AppthemeProvider>(context);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: themeProvider.islightMode
+          ? Colors.white
+          : Colors.grey[900],
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
+        backgroundColor: themeProvider.islightMode
+            ? Colors.white
+            : Colors.grey[800],
         onPressed: () {
           Get.to(AddProduct());
         },
-        child: const Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: themeProvider.islightMode ? Colors.black : Colors.white,
+        ),
       ),
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
+        surfaceTintColor: themeProvider.islightMode
+            ? Colors.white
+            : Colors.grey[900],
+        backgroundColor: themeProvider.islightMode
+            ? Colors.white
+            : Colors.grey[900],
         elevation: 0,
         leading: Obx(
           () => GestureDetector(
@@ -109,7 +132,7 @@ class Home extends StatelessWidget {
             },
             child: Icon(
               isSearching.value ? Icons.close : Icons.search,
-              color: Colors.black,
+              color: themeProvider.islightMode ? Colors.black : Colors.white,
             ),
           ),
         ),
@@ -119,17 +142,22 @@ class Home extends StatelessWidget {
               ? TextField(
                   autofocus: true,
                   onChanged: (value) => homeController.filterProducts(value),
-                  style: const TextStyle(color: Colors.black, fontSize: 16),
+                  style: TextStyle(
+                    color: themeProvider.islightMode
+                        ? Colors.black
+                        : Colors.white,
+                    fontSize: 16,
+                  ),
                   decoration: const InputDecoration(
                     hintText: 'Search furniture...',
                     border: InputBorder.none,
                     hintStyle: TextStyle(color: Colors.grey),
                   ),
                 )
-              : const Column(
+              : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    const Text(
                       'Make Home',
                       style: TextStyle(
                         color: Colors.grey,
@@ -140,7 +168,9 @@ class Home extends StatelessWidget {
                     Text(
                       'BEAUTIFUL',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: themeProvider.islightMode
+                            ? Colors.black
+                            : Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -149,6 +179,16 @@ class Home extends StatelessWidget {
                 ),
         ),
         actions: [
+          // Theme Switch Button (Suraj/Chaand Icon)
+          IconButton(
+            icon: Icon(
+              themeProvider.islightMode ? Icons.nights_stay : Icons.wb_sunny,
+              color: themeProvider.islightMode ? Colors.black : Colors.orange,
+            ),
+            onPressed: () {
+              themeProvider.toggleTheme();
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 15),
             child: GestureDetector(
@@ -159,6 +199,7 @@ class Home extends StatelessWidget {
                 'assets/images/cart.png',
                 width: 24,
                 height: 24,
+                color: themeProvider.islightMode ? null : Colors.white,
               ),
             ),
           ),
@@ -171,11 +212,15 @@ class Home extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildCategoryItem(Icons.star_rounded, 'Popular'),
-                _buildCategoryItem(Icons.chair_outlined, 'Chair'),
-                _buildCategoryItem(Icons.table_restaurant_outlined, 'Table'),
-                _buildCategoryItem(Icons.weekend_outlined, 'Armchair'),
-                _buildCategoryItem(Icons.bed_outlined, 'Bed'),
+                _buildCategoryItem(Icons.star_rounded, 'Popular', context),
+                _buildCategoryItem(Icons.chair_outlined, 'Chair', context),
+                _buildCategoryItem(
+                  Icons.table_restaurant_outlined,
+                  'Table',
+                  context,
+                ),
+                _buildCategoryItem(Icons.weekend_outlined, 'Armchair', context),
+                _buildCategoryItem(Icons.bed_outlined, 'Bed', context),
               ],
             ),
           ),
@@ -185,8 +230,12 @@ class Home extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Obx(() {
                 if (homeController.isLoading.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.black),
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: themeProvider.islightMode
+                          ? Colors.black
+                          : Colors.white,
+                    ),
                   );
                 }
 
@@ -222,7 +271,9 @@ class Home extends StatelessWidget {
                                 Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[200],
+                                    color: themeProvider.islightMode
+                                        ? Colors.grey[200]
+                                        : Colors.grey[800],
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: ClipRRect(
@@ -232,12 +283,13 @@ class Home extends StatelessWidget {
                                       height: double.infinity,
                                       imageUrl: item.image,
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          const Center(
-                                            child: CircularProgressIndicator(
-                                              color: Colors.black,
-                                            ),
-                                          ),
+                                      placeholder: (context, url) => Center(
+                                        child: CircularProgressIndicator(
+                                          color: themeProvider.islightMode
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                      ),
                                       errorWidget: (context, url, error) =>
                                           const Center(
                                             child: Icon(
@@ -254,6 +306,9 @@ class Home extends StatelessWidget {
                                   right: 10,
                                   child: Image.asset(
                                     'assets/images/shoppingbag2.png',
+                                    color: themeProvider.islightMode
+                                        ? null
+                                        : Colors.white,
                                   ),
                                 ),
                                 Positioned(
@@ -263,13 +318,33 @@ class Home extends StatelessWidget {
                                     onTap: () {
                                       Get.defaultDialog(
                                         title: 'Delete Product',
+                                        titleStyle: TextStyle(
+                                          color: themeProvider.islightMode
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                        backgroundColor:
+                                            themeProvider.islightMode
+                                            ? Colors.white
+                                            : Colors.grey[900],
+                                        middleTextStyle: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
                                         middleText:
                                             'Are you sure you want to delete this product?',
                                         textConfirm: 'Yes',
                                         textCancel: 'No',
-                                        confirmTextColor: Colors.white,
-                                        buttonColor: Colors.black,
-                                        cancelTextColor: Colors.black,
+                                        confirmTextColor:
+                                            themeProvider.islightMode
+                                            ? Colors.white
+                                            : Colors.black,
+                                        buttonColor: themeProvider.islightMode
+                                            ? Colors.black
+                                            : Colors.white,
+                                        cancelTextColor:
+                                            themeProvider.islightMode
+                                            ? Colors.black
+                                            : Colors.white,
                                         onConfirm: () {
                                           Get.back();
                                           productController.deleteProduct(
@@ -281,12 +356,16 @@ class Home extends StatelessWidget {
                                         },
                                       );
                                     },
-                                    child: const CircleAvatar(
+                                    child: CircleAvatar(
                                       radius: 15,
-                                      backgroundColor: Colors.white70,
+                                      backgroundColor: themeProvider.islightMode
+                                          ? Colors.white70
+                                          : Colors.black54,
                                       child: Icon(
                                         Icons.cancel_outlined,
-                                        color: Colors.black,
+                                        color: themeProvider.islightMode
+                                            ? Colors.black
+                                            : Colors.white,
                                         size: 20,
                                       ),
                                     ),
@@ -307,12 +386,16 @@ class Home extends StatelessWidget {
                                         ),
                                       );
                                     },
-                                    child: const CircleAvatar(
+                                    child: CircleAvatar(
                                       radius: 15,
-                                      backgroundColor: Colors.white70,
+                                      backgroundColor: themeProvider.islightMode
+                                          ? Colors.white70
+                                          : Colors.black54,
                                       child: Icon(
                                         Icons.edit,
-                                        color: Colors.black,
+                                        color: themeProvider.islightMode
+                                            ? Colors.black
+                                            : Colors.white,
                                         size: 20,
                                       ),
                                     ),
@@ -324,9 +407,12 @@ class Home extends StatelessWidget {
                           const SizedBox(height: 10),
                           Text(
                             item.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              color: themeProvider.islightMode
+                                  ? Colors.black
+                                  : Colors.white,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -334,10 +420,12 @@ class Home extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             '\$${item.price}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: themeProvider.islightMode
+                                  ? Colors.black
+                                  : Colors.white,
                             ),
                           ),
                         ],
@@ -353,7 +441,12 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryItem(IconData iconData, String label) {
+  Widget _buildCategoryItem(
+    IconData iconData,
+    String label,
+    BuildContext context,
+  ) {
+    final themeProvider = Provider.of<AppthemeProvider>(context);
     return Obx(() {
       final bool isActive = homeController.selectedCategory.value == label;
       return GestureDetector(
@@ -365,20 +458,28 @@ class Home extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isActive ? Colors.black : Colors.grey[100],
+                color: isActive
+                    ? (themeProvider.islightMode ? Colors.black : Colors.white)
+                    : (themeProvider.islightMode
+                          ? Colors.grey[100]
+                          : Colors.grey[800]),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 iconData,
                 size: 26,
-                color: isActive ? Colors.white : Colors.grey[600],
+                color: isActive
+                    ? (themeProvider.islightMode ? Colors.white : Colors.black)
+                    : Colors.grey[600],
               ),
             ),
             const SizedBox(height: 5),
             Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.black : Colors.grey,
+                color: isActive
+                    ? (themeProvider.islightMode ? Colors.black : Colors.white)
+                    : Colors.grey,
                 fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
                 fontSize: 12,
               ),

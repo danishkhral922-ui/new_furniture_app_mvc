@@ -10,25 +10,20 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
         leading: const Icon(Icons.search),
         centerTitle: true,
         title: const Text(
           'Notifications',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.black),
+          return Center(
+            child: CircularProgressIndicator(
+              color: Theme.of(context).iconTheme.color,
+            ),
           );
         }
 
@@ -55,10 +50,8 @@ class NotificationsScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
-
               confirmDismiss: (direction) async {
                 await controller.removeNotification(index, notification.id);
-
                 return true;
               },
               child: GestureDetector(
@@ -95,10 +88,14 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.symmetric(vertical: 1),
-      color: isRead ? Colors.white : Colors.grey[200],
+      color: isRead
+          ? Colors.transparent
+          : (isDarkMode ? Colors.grey[800] : Colors.grey[200]),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -112,7 +109,7 @@ class NotificationTile extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: Colors.grey[300],
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
                     child: const Icon(
                       Icons.image_not_supported,
                       color: Colors.grey,
@@ -134,7 +131,6 @@ class NotificationTile extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 5),

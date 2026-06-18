@@ -9,14 +9,13 @@ class AddProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         title: const Text(
           'Add Product',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -27,37 +26,71 @@ class AddProduct extends StatelessWidget {
             key: controller.formKey,
             child: Column(
               children: [
+                // Product Name Field
                 TextFormField(
                   controller: controller.nameController,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   validator: (value) =>
                       value!.isEmpty ? 'Please enter product name' : null,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Product Name',
-                    border: OutlineInputBorder(),
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Price Field
                 TextFormField(
                   controller: controller.priceController,
                   keyboardType: TextInputType.number,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   validator: (value) =>
                       value!.isEmpty ? 'Please enter price' : null,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Price',
-                    border: OutlineInputBorder(),
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // Image URL Field
                 TextFormField(
                   controller: controller.imageController,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
                   validator: (value) =>
                       value!.isEmpty ? 'Please enter image URL' : null,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Image URL',
-                    border: OutlineInputBorder(),
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    border: const OutlineInputBorder(),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30),
+
+                // Submit Button
                 SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -67,24 +100,26 @@ class AddProduct extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        backgroundColor: Colors.black,
+                        backgroundColor: isDarkMode
+                            ? Colors.white
+                            : Colors.black,
                       ),
                       onPressed: controller.isLoading.value
                           ? null
                           : () => controller.addProduct(),
                       child: controller.isLoading.value
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 24,
                               width: 24,
                               child: CircularProgressIndicator(
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.black : Colors.white,
                                 strokeWidth: 2.5,
                               ),
                             )
-                          : const Text(
+                          : Text(
                               'ADD PRODUCT',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.black : Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),

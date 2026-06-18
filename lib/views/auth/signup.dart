@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/auth_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/signup_controller.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/views/auth/login.dart';
+import 'package:get/get.dart';
 
 class Signup extends StatelessWidget {
   Signup({super.key});
@@ -11,8 +11,9 @@ class Signup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -22,31 +23,26 @@ class Signup extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset('assets/images/leftline.png'),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Image.asset('assets/images/center.png'),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Image.asset('assets/images/rightline.png'),
                 ],
               ),
             ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
                     'WELCOME ',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             SizedBox(
               width: 345,
               height: 590,
@@ -55,14 +51,13 @@ class Signup extends StatelessWidget {
                 child: Card(
                   shadowColor: Colors.grey,
                   elevation: 8,
-                  color: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Column(
                       children: [
                         TextFormField(
                           controller: authController.nameController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                             ),
@@ -70,12 +65,12 @@ class Signup extends StatelessWidget {
                             hintStyle: TextStyle(color: Colors.grey),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Divider(color: Colors.grey, thickness: 2),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        const Divider(thickness: 1),
+                        const SizedBox(height: 20),
                         TextFormField(
                           controller: authController.emailController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                             ),
@@ -83,19 +78,19 @@ class Signup extends StatelessWidget {
                             hintStyle: TextStyle(color: Colors.grey),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Divider(color: Colors.grey, thickness: 2),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        const Divider(thickness: 1),
+                        const SizedBox(height: 20),
                         Obx(
                           () => TextFormField(
                             controller: authController.passwordController,
                             obscureText: controller.passwordHidden.value,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
+                              border: const OutlineInputBorder(
                                 borderSide: BorderSide.none,
                               ),
                               hintText: 'Password',
-                              hintStyle: TextStyle(color: Colors.grey),
+                              hintStyle: const TextStyle(color: Colors.grey),
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   controller.togglePassword();
@@ -109,20 +104,20 @@ class Signup extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Divider(color: Colors.grey, thickness: 2),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        const Divider(thickness: 1),
+                        const SizedBox(height: 20),
                         Obx(
                           () => TextFormField(
                             controller:
                                 authController.confirmpasswordController,
                             obscureText: controller.confirmPasswordHidden.value,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
+                              border: const OutlineInputBorder(
                                 borderSide: BorderSide.none,
                               ),
                               hintText: 'Confirm Password',
-                              hintStyle: TextStyle(color: Colors.grey),
+                              hintStyle: const TextStyle(color: Colors.grey),
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   controller.toggleConfirmPassword();
@@ -136,40 +131,40 @@ class Signup extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Divider(color: Colors.grey, thickness: 2),
-                        SizedBox(height: 20),
-
+                        const SizedBox(height: 20),
+                        const Divider(thickness: 1),
+                        const SizedBox(height: 20),
                         SizedBox(
                           height: 50,
                           width: 285,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
+                              backgroundColor: isDarkMode
+                                  ? Colors.white
+                                  : Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                             onPressed: () async {
                               await authController.signUp();
-
                               Get.offAll(Login());
                             },
                             child: Text(
                               'SIGN UP',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: isDarkMode ? Colors.black : Colors.white,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 18,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               'Already have an Account?  ',
                               style: TextStyle(
                                 color: Colors.grey,
@@ -177,17 +172,15 @@ class Signup extends StatelessWidget {
                                 fontSize: 12,
                               ),
                             ),
-
                             GestureDetector(
                               onTap: () {
                                 Get.offAll(Login());
                               },
-                              child: Text(
+                              child: const Text(
                                 'SIGN IN',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black,
                                 ),
                               ),
                             ),

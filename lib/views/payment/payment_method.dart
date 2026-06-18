@@ -10,11 +10,10 @@ class PaymentMethods extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: const Icon(Icons.arrow_back_ios),
@@ -22,11 +21,7 @@ class PaymentMethods extends StatelessWidget {
         centerTitle: true,
         title: const Text(
           'Payment Methods',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
       body: SingleChildScrollView(
@@ -38,6 +33,12 @@ class PaymentMethods extends StatelessWidget {
               _buildPaymentCard(
                 imagePath: 'assets/images/Paymentcard.png',
                 rxCheckValue: controller.check1,
+                context: context,
+                onSelectionChanged: (value) {
+                  if (value) {
+                    controller.check2.value = false;
+                  }
+                },
               ),
               const SizedBox(height: 20),
 
@@ -45,27 +46,37 @@ class PaymentMethods extends StatelessWidget {
               _buildPaymentCard(
                 imagePath: 'assets/images/Paymentcard2.png',
                 rxCheckValue: controller.check2,
+                context: context,
+                onSelectionChanged: (value) {
+                  if (value) {
+                    controller.check1.value = false;
+                  }
+                },
               ),
-              const SizedBox(height: 100), // FAB ke liye safe bottom space
+              const SizedBox(height: 100), // Space for FAB
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
         elevation: 4,
         shape: const CircleBorder(),
         onPressed: () => Get.to(() => AddPayment()),
-        child: const Icon(Icons.add, color: Colors.black),
+        child: Icon(Icons.add, color: isDarkMode ? Colors.white : Colors.black),
       ),
     );
   }
 
-  // Reusable Payment Card Method
+  // Reusable Payment Card Method - Free from hardcoded controller binds
   Widget _buildPaymentCard({
     required String imagePath,
     required RxBool rxCheckValue,
+    required BuildContext context,
+    required ValueChanged<bool> onSelectionChanged,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         Image.asset(imagePath, width: double.infinity, fit: BoxFit.contain),
@@ -75,11 +86,12 @@ class PaymentMethods extends StatelessWidget {
             children: [
               Checkbox(
                 value: rxCheckValue.value,
-                checkColor: Colors.white,
-                activeColor: Colors.black,
+                checkColor: isDarkMode ? Colors.black : Colors.white,
+                activeColor: isDarkMode ? Colors.white : Colors.black,
                 onChanged: (value) {
                   if (value != null) {
                     rxCheckValue.value = value;
+                    onSelectionChanged(value);
                   }
                 },
               ),
@@ -90,7 +102,9 @@ class PaymentMethods extends StatelessWidget {
                   fontWeight: rxCheckValue.value
                       ? FontWeight.bold
                       : FontWeight.normal,
-                  color: rxCheckValue.value ? Colors.black : Colors.grey,
+                  color: rxCheckValue.value
+                      ? (isDarkMode ? Colors.white : Colors.black)
+                      : Colors.grey,
                 ),
               ),
             ],

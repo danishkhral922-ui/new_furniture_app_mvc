@@ -24,55 +24,81 @@ class EditProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ProductController controller = Get.find<ProductController>();
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.white,
         title: const Text(
           'Edit Product',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Product Name Field
             TextField(
               controller: controller.nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                  ),
+                ),
                 labelText: 'Edit Product Name',
+                labelStyle: const TextStyle(color: Colors.grey),
               ),
             ),
             const SizedBox(height: 10),
+
+            // Price Field
             TextField(
               controller: controller.priceController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                  ),
+                ),
                 labelText: 'Edit Price',
+                labelStyle: const TextStyle(color: Colors.grey),
               ),
             ),
             const SizedBox(height: 10),
+
+            // Image URL Field
             TextField(
               controller: controller.imageController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: isDarkMode ? Colors.grey[700]! : Colors.grey,
+                  ),
+                ),
                 labelText: 'Edit Image URL',
+                labelStyle: const TextStyle(color: Colors.grey),
               ),
             ),
             const SizedBox(height: 30),
+
+            // Update Button
             Obx(
               () => ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 onPressed: controller.isLoading.value
@@ -81,20 +107,20 @@ class EditProduct extends StatelessWidget {
                         controller.updateProduct(productId);
                       },
                 child: controller.isLoading.value
-                    ? const SizedBox(
+                    ? SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.black : Colors.white,
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'UPDATE  PRODUCT',
+                    : Text(
+                        'UPDATE PRODUCT',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.black : Colors.white,
                         ),
                       ),
               ),

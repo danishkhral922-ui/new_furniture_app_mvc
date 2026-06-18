@@ -18,11 +18,10 @@ class Checkout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () {
             Get.back();
@@ -56,7 +55,10 @@ class Checkout extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () => Get.to(() => AddShippingAddress()),
-                          child: Image.asset('assets/images/edit.png'),
+                          child: Image.asset(
+                            'assets/images/edit.png',
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                         ),
                       ],
                     ),
@@ -65,9 +67,7 @@ class Checkout extends StatelessWidget {
                       height: 127,
                       width: 335,
                       child: Card(
-                        shadowColor: Colors.grey,
-                        elevation: 8,
-                        color: Colors.white,
+                        elevation: 4,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
@@ -89,7 +89,9 @@ class Checkout extends StatelessWidget {
                                                 .value ==
                                             null
                                         ? Colors.red[300]
-                                        : Colors.black,
+                                        : (isDarkMode
+                                              ? Colors.white
+                                              : Colors.black),
                                   ),
                                 ),
                               ),
@@ -130,7 +132,10 @@ class Checkout extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () => Get.to(() => AddPayment()),
-                          child: Image.asset('assets/images/edit.png'),
+                          child: Image.asset(
+                            'assets/images/edit.png',
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                         ),
                       ],
                     ),
@@ -139,16 +144,17 @@ class Checkout extends StatelessWidget {
                       height: 68,
                       width: 335,
                       child: Card(
-                        shadowColor: Colors.grey,
-                        elevation: 8,
-                        color: Colors.white,
+                        elevation: 4,
                         child: Row(
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
                               ),
-                              child: Image.asset('assets/images/card.png'),
+                              child: Image.asset(
+                                'assets/images/card.png',
+                                color: isDarkMode ? Colors.white : null,
+                              ),
                             ),
                             Obx(() {
                               final paymentVal =
@@ -165,7 +171,9 @@ class Checkout extends StatelessWidget {
                                   fontSize: 16,
                                   color: isEmpty
                                       ? Colors.red[300]
-                                      : Colors.black,
+                                      : (isDarkMode
+                                            ? Colors.white
+                                            : Colors.black),
                                 ),
                               );
                             }),
@@ -185,7 +193,10 @@ class Checkout extends StatelessWidget {
                             color: Colors.grey,
                           ),
                         ),
-                        Image.asset('assets/images/edit.png'),
+                        Image.asset(
+                          'assets/images/edit.png',
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -193,9 +204,7 @@ class Checkout extends StatelessWidget {
                       height: 68,
                       width: 335,
                       child: Card(
-                        shadowColor: Colors.grey,
-                        elevation: 8,
-                        color: Colors.white,
+                        elevation: 4,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -206,12 +215,12 @@ class Checkout extends StatelessWidget {
                               child: Image.asset('assets/images/dhl.png'),
                             ),
                             const SizedBox(width: 20),
-                            const Text(
+                            Text(
                               'Fast (2-3 days)',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: isDarkMode ? Colors.white : Colors.black,
                               ),
                             ),
                           ],
@@ -223,9 +232,7 @@ class Checkout extends StatelessWidget {
                       height: 135,
                       width: 335,
                       child: Card(
-                        shadowColor: Colors.grey,
-                        elevation: 8,
-                        color: Colors.white,
+                        elevation: 4,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -273,28 +280,34 @@ class Checkout extends StatelessWidget {
                                   Obx(
                                     () => Text(
                                       '\$ ${controller.totalPrice().toStringAsFixed(2)}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 18,
-                                        color: Colors.black,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
-                                  const Text(
+                                  Text(
                                     '\$ 5.00',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 18,
-                                      color: Colors.black,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                   Obx(
                                     () => Text(
                                       '\$ ${(controller.totalPrice() + 5).toStringAsFixed(2)}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 18,
-                                        color: Colors.black,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ),
@@ -321,7 +334,7 @@ class Checkout extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () async {
                   if (shippingController.currentShipping.value == null) {
@@ -351,11 +364,7 @@ class Checkout extends StatelessWidget {
                       finalAmount: controller.totalPrice() + 5,
                     );
 
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Congrats()),
-                      (route) => false,
-                    );
+                    Get.offAll(() => const Congrats());
                   } catch (e) {
                     Get.snackbar(
                       'Error',
@@ -365,12 +374,12 @@ class Checkout extends StatelessWidget {
                     );
                   }
                 },
-                child: const Text(
+                child: Text(
                   'SUBMIT ORDER',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ),

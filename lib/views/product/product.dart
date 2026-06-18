@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/cart_controller.dart';
 import 'package:new_furiniture_app_mvc/controllers/favourite_controller.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
+import 'package:get/get.dart';
 
 class Product extends StatelessWidget {
   final ProductModel product;
@@ -18,20 +18,21 @@ class Product extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
+                // Top Image Container with Banner Arc
                 Container(
                   width: screenWidth,
                   height: 380,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(40),
                     ),
@@ -45,13 +46,17 @@ class Product extends StatelessWidget {
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
-                        return const Center(
-                          child: CircularProgressIndicator(color: Colors.black),
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                          ),
                         );
                       },
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Colors.grey[200],
+                          color: isDarkMode
+                              ? Colors.grey[850]
+                              : Colors.grey[200],
                           child: const Center(
                             child: Icon(
                               Icons.image_not_supported,
@@ -64,6 +69,7 @@ class Product extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Floating Back Arrow Button
                 Positioned(
                   top: 50,
                   left: 20,
@@ -73,7 +79,7 @@ class Product extends StatelessWidget {
                       height: 40,
                       width: 40,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: isDarkMode ? Colors.grey[850] : Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
@@ -83,13 +89,13 @@ class Product extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Padding(
-                          padding: EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.only(left: 6),
                           child: Icon(
                             Icons.arrow_back_ios,
                             size: 16,
-                            color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                         ),
                       ),
@@ -99,18 +105,22 @@ class Product extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 25),
+
+            // Product Name
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 product.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
             ),
             const SizedBox(height: 10),
+
+            // Price & Static Quantity Row
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
@@ -118,36 +128,38 @@ class Product extends StatelessWidget {
                 children: [
                   Text(
                     '\$ ${product.price}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Quantity: 1',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 15),
+
+            // Rating & Reviews Indicator
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
                   const Icon(Icons.star, color: Colors.amber, size: 22),
                   const SizedBox(width: 5),
-                  const Text(
+                  Text(
                     '4.5',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -163,6 +175,8 @@ class Product extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Description Box
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
@@ -172,13 +186,14 @@ class Product extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: Colors.grey[600],
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   height: 1.5,
                 ),
               ),
             ),
-
             const SizedBox(height: 50),
+
+            // Bottom Action Bar (Favorite & Add To Cart Button)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
@@ -217,12 +232,16 @@ class Product extends StatelessWidget {
                         height: 55,
                         width: 55,
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: isDarkMode
+                              ? Colors.grey[850]
+                              : Colors.grey[100],
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           isFav ? Icons.favorite : Icons.favorite_border,
-                          color: isFav ? Colors.red : Colors.black,
+                          color: isFav
+                              ? Colors.red
+                              : (isDarkMode ? Colors.white : Colors.black),
                           size: 26,
                         ),
                       ),
@@ -234,7 +253,9 @@ class Product extends StatelessWidget {
                       height: 55,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: isDarkMode
+                              ? Colors.white
+                              : Colors.black,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -255,12 +276,12 @@ class Product extends StatelessWidget {
                           );
                           Get.to(() => Cart());
                         },
-                        child: const Text(
+                        child: Text(
                           'Add to cart',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: isDarkMode ? Colors.black : Colors.white,
                           ),
                         ),
                       ),

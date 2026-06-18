@@ -8,8 +8,9 @@ class Congrats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -61,16 +62,16 @@ class Congrats extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                   elevation: 0,
                 ),
                 onPressed: () => Get.to(() => OrderScreen()),
-                child: const Text(
+                child: Text(
                   'Track Your Orders',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ),
@@ -84,16 +85,20 @@ class Congrats extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  side: const BorderSide(color: Colors.black),
-                  backgroundColor: Colors.white,
+                  side: BorderSide(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+                  backgroundColor: isDarkMode
+                      ? Colors.transparent
+                      : Colors.white,
                 ),
                 onPressed: () => Get.offAll(() => Home()),
-                child: const Text(
+                child: Text(
                   'BACK TO HOME',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
               ),

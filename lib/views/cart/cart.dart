@@ -10,11 +10,10 @@ class Cart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        surfaceTintColor: Colors.white,
-        backgroundColor: Colors.white,
         leading: GestureDetector(
           onTap: () {
             Get.back();
@@ -23,11 +22,7 @@ class Cart extends StatelessWidget {
         ),
         title: const Text(
           'My Cart',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -86,6 +81,9 @@ class Cart extends StatelessWidget {
                                       },
                                       child: Image.asset(
                                         'assets/images/plus.png',
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                     const SizedBox(width: 10),
@@ -103,6 +101,9 @@ class Cart extends StatelessWidget {
                                       },
                                       child: Image.asset(
                                         'assets/images/minus.png',
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                   ],
@@ -116,7 +117,7 @@ class Cart extends StatelessWidget {
                               },
                               child: Image.asset(
                                 'assets/images/cancel.png',
-                                color: Colors.black,
+                                color: isDarkMode ? Colors.white : Colors.black,
                               ),
                             ),
                           ],
@@ -133,13 +134,13 @@ class Cart extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Row(
               children: [
-                Card(
-                  color: Colors.white,
-                  child: SizedBox(
-                    height: 44,
-                    width: 276,
+                SizedBox(
+                  height: 44,
+                  width: 276,
+                  child: Card(
+                    margin: EdgeInsets.zero,
                     child: TextFormField(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: OutlineInputBorder(borderSide: BorderSide.none),
                         hintText: 'Enter Your Promo Code',
                         hintStyle: TextStyle(
@@ -151,16 +152,17 @@ class Cart extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(width: 10),
                 Container(
                   height: 44,
                   width: 44,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: isDarkMode ? Colors.white : Colors.black,
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_forward_ios,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ],
@@ -184,7 +186,6 @@ class Cart extends StatelessWidget {
                   () => Text(
                     '\$ ${controller.totalPrice().toStringAsFixed(2)}',
                     style: const TextStyle(
-                      color: Colors.black,
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
                     ),
@@ -204,17 +205,17 @@ class Cart extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: Colors.black,
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () {
                   Get.to(Checkout());
                 },
-                child: const Text(
+                child: Text(
                   'Check Out',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
                 ),
               ),
