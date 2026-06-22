@@ -16,6 +16,7 @@ class OrderScreen extends StatelessWidget {
           ? Colors.white
           : Colors.grey[900],
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         backgroundColor: themeProvider.isLightMode
             ? Colors.white
             : Colors.grey[900],

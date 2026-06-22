@@ -7,7 +7,6 @@ import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
 
 class Product extends StatelessWidget {
   final ProductModel product;
-
   const Product({super.key, required this.product});
 
   @override
@@ -85,9 +84,7 @@ class Product extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            product.description.isNotEmpty
-                ? product.description
-                : 'Premium furniture for your home.',
+            product.description,
             style: TextStyle(
               color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
               height: 1.5,
@@ -99,8 +96,6 @@ class Product extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, bool isDarkMode) {
-    final cartProvider = context.read<CartProvider>();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -109,19 +104,27 @@ class Product extends StatelessWidget {
             builder: (context, fav, _) {
               final isFav = fav.isFavourite(product.name);
               return GestureDetector(
-                onTap: () => isFav
-                    ? fav.removeFromFavourite(context, product.name)
-                    : fav.addToFavourite(
+                onTap: () async {
+                  try {
+                    if (isFav) {
+                      await fav.removeFromFavourite(context, product.name);
+                    } else {
+                      await fav.addToFavourite(
                         name: product.name,
-                        price: product.price.toString(),
+                        price: product.price,
                         image: product.image,
-                      ),
+                      );
+                    }
+                  } catch (e) {
+                    debugPrint("Fav Error: $e");
+                  }
+                },
                 child: Container(
                   height: 55,
                   width: 55,
                   decoration: BoxDecoration(
                     color: isDarkMode ? Colors.grey[850] : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     isFav ? Icons.favorite : Icons.favorite_border,
@@ -139,13 +142,13 @@ class Product extends StatelessWidget {
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadiusGeometry.circular(8),
                   ),
+                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 ),
                 onPressed: () async {
-                  await cartProvider.addToCart(
+                  await context.read<CartProvider>().addToCart(
                     name: product.name,
                     price: product.price,
                     image: product.image,
@@ -160,7 +163,6 @@ class Product extends StatelessWidget {
                   'Add to cart',
                   style: TextStyle(
                     color: isDarkMode ? Colors.black : Colors.white,
-                    fontSize: 16,
                   ),
                 ),
               ),

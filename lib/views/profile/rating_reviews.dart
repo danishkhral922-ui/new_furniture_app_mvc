@@ -11,8 +11,10 @@ class RatingReviews extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
@@ -49,7 +51,10 @@ class RatingReviews extends StatelessWidget {
         height: 50,
         child: FloatingActionButton(
           backgroundColor: isDarkMode ? Colors.white : Colors.black,
-          onPressed: () => Get.to(() => const MyReviews()),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MyReviews()),
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

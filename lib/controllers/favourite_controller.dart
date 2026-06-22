@@ -19,12 +19,11 @@ class FavouriteProvider extends ChangeNotifier {
   }
 
   Future<void> _initHiveAndStream() async {
-    try {
-      _favouriteBox = Hive.box<FavouriteModel>('favouritesBox');
-    } catch (e) {
-      _favouriteBox = await Hive.openBox<FavouriteModel>('favouritesBox');
-    }
-    _loadOfflineItems();
+    _favouriteBox = await Hive.openBox<FavouriteModel>('favouritesBox');
+    _favouriteItems = _favouriteBox.values.toList();
+    _isLoading = false;
+    notifyListeners();
+
     _streamSubscription = _favouriteService.getFavouriteStream().listen((
       items,
     ) async {
@@ -36,30 +35,8 @@ class FavouriteProvider extends ChangeNotifier {
     });
   }
 
-  void _loadOfflineItems() {
-    if (_favouriteBox.isNotEmpty) {
-      _favouriteItems = _favouriteBox.values.toList();
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> toggleFavourite({
-    required BuildContext context,
-    required String name,
-    required String price,
-    required String image,
-  }) async {
-    if (isFavourite(name)) {
-      await removeFromFavourite(context, name);
-    } else {
-      await _favouriteService.addToFavourite(
-        name: name,
-        price: price,
-        image: image,
-      );
-    }
-    notifyListeners();
+  bool isFavourite(String name) {
+    return _favouriteItems.any((item) => item.name == name);
   }
 
   Future<void> addToFavourite({
@@ -72,32 +49,16 @@ class FavouriteProvider extends ChangeNotifier {
       price: price,
       image: image,
     );
+    notifyListeners();
   }
 
   Future<void> removeFavourite(String id) async {
-    await _favouriteService.removeFavourite(id);
-  }
-
-  bool isFavourite(String productName) {
-    return _favouriteItems.any((element) => element.name == productName);
-  }
-
-  Future<void> removeFromFavourite(BuildContext context, String name) async {
     try {
-      final item = _favouriteItems.firstWhere(
-        (element) => element.name == name,
-      );
-      await removeFavourite(item.id);
+      await _favouriteService.removeFavourite(id);
+      _favouriteItems.removeWhere((item) => item.id == id);
+      notifyListeners();
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Could not remove from favourites'),
-            backgroundColor: Colors.red[400],
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+      debugPrint("Error: $e");
     }
   }
 
@@ -106,4 +67,6 @@ class FavouriteProvider extends ChangeNotifier {
     _streamSubscription?.cancel();
     super.dispose();
   }
+
+  Future<void> removeFromFavourite(BuildContext context, String name) async {}
 }

@@ -30,12 +30,12 @@ class Setting extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Consumer<ProfileProvider>(
-            builder: (_, provider, __) =>
+            builder: (_, provider, _) =>
                 _buildInfoCard('Name', provider.userName),
           ),
           const SizedBox(height: 10),
           Consumer<ProfileProvider>(
-            builder: (_, provider, __) =>
+            builder: (_, provider, _) =>
                 _buildInfoCard('Email', provider.userEmail),
           ),
           const SizedBox(height: 20),
@@ -46,11 +46,11 @@ class Setting extends StatelessWidget {
           _buildSectionHeader('Notifications'),
           const SizedBox(height: 10),
           Consumer<SwitchProvider>(
-            builder: (_, p, __) =>
+            builder: (_, p, _) =>
                 _buildSwitchCard('Sales', p.switch1, (v) => p.setSwitch1(v)),
           ),
           Consumer<SwitchProvider>(
-            builder: (_, p, __) => _buildSwitchCard(
+            builder: (_, p, _) => _buildSwitchCard(
               'New arrivals',
               p.switch2,
               (v) => p.setSwitch1(v),
@@ -122,7 +122,7 @@ class Setting extends StatelessWidget {
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: Colors.green,
+        activeThumbColor: Colors.green,
       ),
     );
   }

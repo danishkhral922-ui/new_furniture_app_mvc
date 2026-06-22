@@ -99,6 +99,7 @@ class _HomeState extends State<Home> {
     AppThemeProvider themeProvider,
   ) {
     return AppBar(
+      surfaceTintColor: Colors.white,
       backgroundColor: themeProvider.isLightMode
           ? Colors.white
           : Colors.grey[900],
