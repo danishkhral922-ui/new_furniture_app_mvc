@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/notification_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -7,6 +9,8 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<AppThemeProvider>();
+
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(Icons.search),
@@ -21,7 +25,7 @@ class NotificationsScreen extends StatelessWidget {
           if (provider.isLoading) {
             return Center(
               child: CircularProgressIndicator(
-                color: Theme.of(context).iconTheme.color,
+                color: themeProvider.isLightMode ? Colors.black : Colors.white,
               ),
             );
           }
@@ -50,23 +54,19 @@ class NotificationsScreen extends StatelessWidget {
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 confirmDismiss: (direction) async {
-                  final success = await context
+                  return await context
                       .read<NotificationProvider>()
                       .removeNotification(index, notification.id);
-                  return success;
                 },
                 child: GestureDetector(
-                  onTap: () {
-                    context.read<NotificationProvider>().markNotificationAsRead(
-                      index,
-                      notification.id,
-                    );
-                  },
+                  onTap: () => context
+                      .read<NotificationProvider>()
+                      .markNotificationAsRead(index, notification.id),
                   child: NotificationTile(
+                    imageUrl: notification.imageUrl,
                     title: notification.title,
                     description: notification.description,
                     isRead: notification.isRead,
-                    imageUrl: notification.imageUrl,
                   ),
                 ),
               );
@@ -94,14 +94,14 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = context.watch<AppThemeProvider>();
 
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.symmetric(vertical: 1),
       color: isRead
           ? Colors.transparent
-          : (isDarkMode ? Colors.grey[800] : Colors.grey[200]),
+          : (themeProvider.isLightMode ? Colors.grey[200] : Colors.grey[800]),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -110,18 +110,20 @@ class NotificationTile extends StatelessWidget {
             width: 70,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                imageUrl,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                    child: const Icon(
-                      Icons.image_not_supported,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
+                placeholder: (context, url) =>
+                    Container(color: Colors.grey[300]),
+                errorWidget: (context, url, error) => Container(
+                  color: themeProvider.isLightMode
+                      ? Colors.grey[300]
+                      : Colors.grey[800],
+                  child: const Icon(
+                    Icons.image_not_supported,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
             ),
           ),
@@ -134,9 +136,12 @@ class NotificationTile extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
+                    color: themeProvider.isLightMode
+                        ? Colors.black
+                        : Colors.white,
                   ),
                 ),
                 const SizedBox(height: 5),

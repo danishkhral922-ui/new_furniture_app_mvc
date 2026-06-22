@@ -8,9 +8,9 @@ class MyReviews extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Get.back(),
-          child: const Icon(Icons.arrow_back_ios),
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
         title: const Text(
@@ -18,44 +18,21 @@ class MyReviews extends StatelessWidget {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
-            children: [
-              _buildReviewCard(
-                productName: 'Minimal Lamp',
-                price: '\$ 12.00',
-                imagePath: 'assets/images/coffeetable2.png',
-                rating: 5,
-                date: '20/03/2020',
-                reviewText:
-                    'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-              ),
-              const SizedBox(height: 16),
-              _buildReviewCard(
-                productName: 'Minimal Lamp',
-                price: '\$ 12.00',
-                imagePath: 'assets/images/coffeetable2.png',
-                rating: 5,
-                date: '20/03/2020',
-                reviewText:
-                    'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-              ),
-              const SizedBox(height: 16),
-              _buildReviewCard(
-                productName: 'Minimal Lamp',
-                price: '\$ 12.00',
-                imagePath: 'assets/images/coffeetable2.png',
-                rating: 5,
-                date: '20/03/2020',
-                reviewText:
-                    'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
+      body: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        itemCount: 3,
+        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          return _buildReviewCard(
+            productName: 'Minimal Lamp',
+            price: '\$ 12.00',
+            imagePath: 'assets/images/coffeetable2.png',
+            rating: 5,
+            date: '20/03/2020',
+            reviewText:
+                'Nice Furniture with good delivery. The delivery time is very fast. The products look exactly like the picture in the app. The quality is very good despite the cheap price.',
+          );
+        },
       ),
     );
   }
@@ -69,8 +46,7 @@ class MyReviews extends StatelessWidget {
     required String reviewText,
   }) {
     return Card(
-      elevation: 4,
-      shadowColor: Colors.black12,
+      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,39 +54,36 @@ class MyReviews extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
+                  child: Image.asset(
+                    imagePath,
                     height: 60,
                     width: 60,
-                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        productName,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      productName,
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        price,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ),
+                    Text(
+                      price,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),

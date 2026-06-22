@@ -16,12 +16,12 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     final profileProvider = context.watch<ProfileProvider>();
     final orderProvider = context.watch<OrderProvider>();
 
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.white,
         leading: const Icon(Icons.search),
         centerTitle: true,
         title: const Text(
@@ -31,20 +31,18 @@ class Profile extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: GestureDetector(
-              onTap: () async {
+            child: IconButton(
+              onPressed: () async {
                 await FirebaseAuth.instance.signOut();
                 if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const AuthWrapper(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const AuthWrapper()),
                     (route) => false,
                   );
                 }
               },
-              child: Image.asset(
+              icon: Image.asset(
                 'assets/images/forward.png',
                 color: isDarkMode ? Colors.white : Colors.black,
               ),
@@ -53,147 +51,106 @@ class Profile extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Image.asset('assets/images/profile.png'),
-                  const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        profileProvider.userName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                        ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Image.asset('assets/images/profile.png', height: 80, width: 80),
+                const SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profileProvider.userName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
                       ),
-                      Text(
-                        profileProvider.userEmail,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              _buildMenuTile(
-                title: 'My orders',
-                subtitle:
-                    'Already have ${orderProvider.ordersList.length} orders',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrderScreen(),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 15),
-              _buildMenuTile(
-                title: 'Shipping Addresses',
-                subtitle: '03 Addresses',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ShoppingAddress()),
-                  );
-                },
-              ),
-              const SizedBox(height: 15),
-              _buildMenuTile(
-                title: 'Payment Method',
-                subtitle: 'You have 2 cards',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PaymentMethods()),
-                  );
-                },
-              ),
-              const SizedBox(height: 15),
-              _buildMenuTile(
-                title: 'My reviews',
-                subtitle: 'Reviews for 5 items',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RatingReviews(),
+                    Text(
+                      profileProvider.userEmail,
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
-                  );
-                },
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            _buildMenuTile(
+              context,
+              'My orders',
+              'Already have ${orderProvider.ordersList.length} orders',
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OrderScreen()),
               ),
-              const SizedBox(height: 15),
-              _buildMenuTile(
-                title: 'Setting',
-                subtitle: 'Notification, Password, FAQ, Contact',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Setting()),
-                  );
-                },
+            ),
+            _buildMenuTile(
+              context,
+              'Shipping Addresses',
+              '03 Addresses',
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ShoppingAddress()),
               ),
-            ],
-          ),
+            ),
+            _buildMenuTile(
+              context,
+              'Payment Method',
+              'You have 2 cards',
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PaymentMethods()),
+              ),
+            ),
+            _buildMenuTile(
+              context,
+              'My reviews',
+              'Reviews for 5 items',
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RatingReviews()),
+              ),
+            ),
+            _buildMenuTile(
+              context,
+              'Setting',
+              'Notification, Password, FAQ, Contact',
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const Setting()),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildMenuTile({
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        height: 80,
-        width: 335,
-        child: Card(
-          shadowColor: Colors.grey.withAlpha(60),
-          elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-                const Icon(Icons.arrow_forward_ios, size: 18),
-              ],
-            ),
+  Widget _buildMenuTile(
+    BuildContext context,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      child: Card(
+        elevation: 4,
+        shadowColor: Colors.grey.withAlpha(60),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: ListTile(
+          onTap: onTap,
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
           ),
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         ),
       ),
     );

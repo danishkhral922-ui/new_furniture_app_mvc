@@ -13,9 +13,9 @@ class PaymentMethods extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: const Text(
@@ -24,35 +24,23 @@ class PaymentMethods extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-          child: Column(
-            children: [
-              _buildPaymentCard(
-                imagePath: 'assets/images/Paymentcard.png',
-                checkValue: checkProvider.check1,
-                context: context,
-                onSelectionChanged: (value) {
-                  if (value) {
-                    checkProvider.changeSelection(1);
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-
-              _buildPaymentCard(
-                imagePath: 'assets/images/Paymentcard2.png',
-                checkValue: checkProvider.check2,
-                context: context,
-                onSelectionChanged: (value) {
-                  if (value) {
-                    checkProvider.changeSelection(2);
-                  }
-                },
-              ),
-              const SizedBox(height: 100),
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+        child: Column(
+          children: [
+            _buildPaymentCard(
+              imagePath: 'assets/images/Paymentcard.png',
+              checkValue: checkProvider.check1,
+              isDarkMode: isDarkMode,
+              onChanged: (value) => checkProvider.changeSelection(1),
+            ),
+            const SizedBox(height: 20),
+            _buildPaymentCard(
+              imagePath: 'assets/images/Paymentcard2.png',
+              checkValue: checkProvider.check2,
+              isDarkMode: isDarkMode,
+              onChanged: (value) => checkProvider.changeSelection(2),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -62,7 +50,7 @@ class PaymentMethods extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddPayment()),
+            MaterialPageRoute(builder: (context) => const AddPayment()),
           );
         },
         child: Icon(Icons.add, color: isDarkMode ? Colors.white : Colors.black),
@@ -73,11 +61,9 @@ class PaymentMethods extends StatelessWidget {
   Widget _buildPaymentCard({
     required String imagePath,
     required bool checkValue,
-    required BuildContext context,
-    required ValueChanged<bool> onSelectionChanged,
+    required bool isDarkMode,
+    required ValueChanged<bool> onChanged,
   }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       children: [
         Image.asset(imagePath, width: double.infinity, fit: BoxFit.contain),
@@ -89,9 +75,7 @@ class PaymentMethods extends StatelessWidget {
               checkColor: isDarkMode ? Colors.black : Colors.white,
               activeColor: isDarkMode ? Colors.white : Colors.black,
               onChanged: (value) {
-                if (value != null) {
-                  onSelectionChanged(value);
-                }
+                if (value != null) onChanged(value);
               },
             ),
             Text(

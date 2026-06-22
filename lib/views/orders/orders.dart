@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:new_furiniture_app_mvc/controllers/order_controller.dart';
+import 'package:new_furiniture_app_mvc/controllers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class OrderScreen extends StatelessWidget {
@@ -7,25 +8,37 @@ class OrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = context.watch<AppThemeProvider>();
     final orderProvider = context.watch<OrderProvider>();
 
     return Scaffold(
+      backgroundColor: themeProvider.isLightMode
+          ? Colors.white
+          : Colors.grey[900],
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios),
+        backgroundColor: themeProvider.isLightMode
+            ? Colors.white
+            : Colors.grey[900],
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: themeProvider.isLightMode ? Colors.black : Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'My Orders',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+            color: themeProvider.isLightMode ? Colors.black : Colors.white,
+          ),
         ),
         centerTitle: true,
       ),
-      body: Builder(
-        builder: (context) {
-          if (orderProvider.ordersList.isEmpty) {
-            return const Center(
+      body: orderProvider.ordersList.isEmpty
+          ? const Center(
               child: Text(
                 'No orders placed yet.',
                 style: TextStyle(
@@ -34,84 +47,87 @@ class OrderScreen extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: orderProvider.ordersList.length,
-            itemBuilder: (context, index) {
-              final order = orderProvider.ordersList[index];
-              return Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            order.orderNo,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: isDarkMode ? Colors.white : Colors.black,
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: orderProvider.ordersList.length,
+              itemBuilder: (context, index) {
+                final order = orderProvider.ordersList[index];
+                return Card(
+                  color: themeProvider.isLightMode
+                      ? Colors.white
+                      : Colors.grey[800],
+                  elevation: 2,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              order.orderNo,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: themeProvider.isLightMode
+                                    ? Colors.black
+                                    : Colors.white,
+                              ),
                             ),
-                          ),
-                          Text(
-                            order.date,
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
+                            Text(
+                              order.date,
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 20, thickness: 1),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Quantity: ${order.quantity}',
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
+                          ],
+                        ),
+                        Divider(
+                          color: Colors.grey[400],
+                          height: 20,
+                          thickness: 0.5,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Quantity: ${order.quantity}',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Total: \$${order.totalAmount}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              color: isDarkMode ? Colors.white : Colors.black,
+                            Text(
+                              'Total: \$${order.totalAmount}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                                color: themeProvider.isLightMode
+                                    ? Colors.black
+                                    : Colors.white,
+                              ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          order.status,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.green,
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            order.status,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+                );
+              },
+            ),
     );
   }
 }

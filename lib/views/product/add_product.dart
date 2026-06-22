@@ -19,116 +19,83 @@ class AddProduct extends StatelessWidget {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: productProvider.formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: productProvider.nameController,
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter product name' : null,
-                  decoration: InputDecoration(
-                    hintText: 'Product Name',
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: const OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: productProvider.priceController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter price' : null,
-                  decoration: InputDecoration(
-                    hintText: 'Price',
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: const OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: productProvider.imageController,
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                  ),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter image URL' : null,
-                  decoration: InputDecoration(
-                    hintText: 'Image URL',
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    border: const OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: Consumer<ProductProvider>(
-                    builder: (context, provider, child) {
-                      return ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          backgroundColor: isDarkMode
-                              ? Colors.white
-                              : Colors.black,
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: productProvider.formKey,
+          child: Column(
+            children: [
+              _buildTextField(
+                productProvider.nameController,
+                'Product Name',
+                TextInputAction.next,
+              ),
+              const SizedBox(height: 20),
+              _buildTextField(
+                productProvider.priceController,
+                'Price',
+                TextInputAction.next,
+                isNumber: true,
+              ),
+              const SizedBox(height: 20),
+              _buildTextField(
+                productProvider.imageController,
+                'Image URL',
+                TextInputAction.done,
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: Consumer<ProductProvider>(
+                  builder: (context, provider, child) {
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDarkMode
+                            ? Colors.white
+                            : Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        onPressed: provider.isLoading
-                            ? null
-                            : () => provider.addProduct(context),
-                        child: provider.isLoading
-                            ? SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  color: isDarkMode
-                                      ? Colors.black
-                                      : Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
-                            : Text(
-                                'ADD PRODUCT',
-                                style: TextStyle(
-                                  color: isDarkMode
-                                      ? Colors.black
-                                      : Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      ),
+                      onPressed: provider.isLoading
+                          ? null
+                          : () => provider.addProduct(context),
+                      child: provider.isLoading
+                          ? CircularProgressIndicator(
+                              color: isDarkMode ? Colors.black : Colors.white,
+                            )
+                          : Text(
+                              'ADD PRODUCT',
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.black : Colors.white,
                               ),
-                      );
-                    },
-                  ),
+                            ),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint,
+    TextInputAction action, {
+    bool isNumber = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      textInputAction: action,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      validator: (value) =>
+          (value == null || value.trim().isEmpty) ? 'Please enter $hint' : null,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: const OutlineInputBorder(),
       ),
     );
   }

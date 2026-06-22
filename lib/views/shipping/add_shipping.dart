@@ -6,108 +6,13 @@ import 'package:new_furiniture_app_mvc/views/shipping/add_shipping_address.dart'
 class ShoppingAddress extends StatelessWidget {
   const ShoppingAddress({super.key});
 
-  void showEditDialog(
-    BuildContext context,
-    int index,
-    String currentName,
-    String currentAddress,
-  ) {
-    final shippingProvider = context.read<ShippingProvider>();
-    shippingProvider.editNameController.text = currentName;
-    shippingProvider.editAddressController.text = currentAddress;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
-          title: Text(
-            'Edit Shipping Address',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: shippingProvider.editNameController,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Full Name',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
-              TextField(
-                controller: shippingProvider.editAddressController,
-                maxLines: 2,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'Address',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode ? Colors.white : Colors.black,
-              ),
-              onPressed: () {
-                shippingProvider.updateExistingAddress(
-                  context,
-                  index,
-                  currentName,
-                );
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Save',
-                style: TextStyle(
-                  color: isDarkMode ? Colors.black : Colors.white,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
         title: const Text(
@@ -116,16 +21,12 @@ class ShoppingAddress extends StatelessWidget {
         ),
       ),
       body: Consumer<ShippingProvider>(
-        builder: (context, provider, child) {
+        builder: (context, provider, _) {
           if (provider.shippingAddresses.isEmpty) {
             return const Center(
               child: Text(
                 'No Shipping Address Added Yet!',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(color: Colors.grey),
               ),
             );
           }
@@ -134,101 +35,60 @@ class ShoppingAddress extends StatelessWidget {
             padding: const EdgeInsets.all(15),
             itemCount: provider.shippingAddresses.length,
             itemBuilder: (context, index) {
-              final addressItem = provider.shippingAddresses[index];
+              final item = provider.shippingAddresses[index];
               final isSelected = provider.selectedAddressIndex == index;
 
               return Column(
                 children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: isSelected,
-                        activeColor: isDarkMode ? Colors.white : Colors.black,
-                        checkColor: isDarkMode ? Colors.black : Colors.white,
-                        onChanged: (value) {
-                          if (value == true) {
-                            provider.selectAddress(index);
-                          }
-                        },
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: isSelected,
+                    title: Text(
+                      'Use as the shipping address',
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
-                      Text(
-                        'Use as the shipping address',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                          color: isSelected
-                              ? (isDarkMode ? Colors.white : Colors.black)
-                              : Colors.grey,
-                        ),
-                      ),
-                    ],
+                    ),
+                    onChanged: (val) =>
+                        val == true ? provider.selectAddress(index) : null,
                   ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    width: 335,
-                    child: Card(
-                      shadowColor: isDarkMode
-                          ? Colors.black45
-                          : Colors.grey.withAlpha(128),
-                      elevation: 4,
-                      color: isDarkMode ? Colors.grey[850] : Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  addressItem.fullName,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18,
-                                    color: isDarkMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
+                  Card(
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.fullName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    showEditDialog(
-                                      context,
-                                      index,
-                                      addressItem.fullName,
-                                      addressItem.address,
-                                    );
-                                  },
-                                  child: Image.asset(
-                                    'assets/images/edit.png',
-                                    color: isDarkMode ? Colors.white : null,
-                                    height: 20,
-                                    width: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Divider(
-                              color: isDarkMode
-                                  ? Colors.grey[700]
-                                  : Colors.grey[300],
-                              thickness: 1,
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              addressItem.address,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: isDarkMode
-                                    ? Colors.grey[400]
-                                    : Colors.grey,
                               ),
-                            ),
-                          ],
-                        ),
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 20),
+                                onPressed: () => _showEditDialog(
+                                  context,
+                                  index,
+                                  item.fullName,
+                                  item.address,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Divider(),
+                          Text(
+                            item.address,
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -240,14 +100,68 @@ class ShoppingAddress extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: isDarkMode ? Colors.white : Colors.black,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddShippingAddress()),
-          );
-        },
-        child: Icon(Icons.add, color: isDarkMode ? Colors.black : Colors.white),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black,
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AddShippingAddress()),
+        ),
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black
+              : Colors.white,
+        ),
+      ),
+    );
+  }
+
+  void _showEditDialog(
+    BuildContext context,
+    int index,
+    String name,
+    String address,
+  ) {
+    final provider = context.read<ShippingProvider>();
+    provider.editNameController.text = name;
+    provider.editAddressController.text = address;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Edit Shipping Address'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: provider.editNameController,
+              decoration: const InputDecoration(labelText: 'Full Name'),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: provider.editAddressController,
+              decoration: const InputDecoration(labelText: 'Address'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? Colors.white : Colors.black,
+            ),
+            onPressed: () {
+              provider.updateExistingAddress(context, index, name);
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
       ),
     );
   }

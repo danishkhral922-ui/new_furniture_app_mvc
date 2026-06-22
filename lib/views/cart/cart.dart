@@ -13,11 +13,9 @@ class Cart extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(Icons.arrow_back_ios),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'My Cart',
@@ -25,196 +23,181 @@ class Cart extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: cartProvider.cartItems.length,
-              itemBuilder: (context, index) {
-                final item = cartProvider.cartItems[index];
-
-                return Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: NetworkImage(item.image),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.name,
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Text(
-                                '\$ ${item.price}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 25),
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      cartProvider.increaseQuantity(item.id);
-                                    },
-                                    child: Image.asset(
-                                      'assets/images/plus.png',
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    item.quantity.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  GestureDetector(
-                                    onTap: () {
-                                      cartProvider.decreaseQuantity(item.id);
-                                    },
-                                    child: Image.asset(
-                                      'assets/images/minus.png',
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              cartProvider.deleteItem(item.id);
-                            },
-                            child: Image.asset(
-                              'assets/images/cancel.png',
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Divider(color: Colors.grey[200], thickness: 2),
-                    ],
-                  ),
-                );
-              },
+      body: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 800),
+        tween: Tween(begin: 0.0, end: 1.0),
+        builder: (context, opacity, child) {
+          return Opacity(opacity: opacity, child: child);
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: cartProvider.cartItems.length,
+                itemBuilder: (context, index) {
+                  final item = cartProvider.cartItems[index];
+                  return _buildCartItem(item, cartProvider, isDarkMode);
+                },
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              children: [
-                SizedBox(
-                  height: 44,
-                  width: 276,
-                  child: Card(
-                    margin: EdgeInsets.zero,
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(borderSide: BorderSide.none),
-                        hintText: 'Enter Your Promo Code',
-                        hintStyle: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w400,
+            _buildBottomSection(context, cartProvider, isDarkMode),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartItem(item, cartProvider, isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                    image: NetworkImage(item.image),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    '\$ ${item.price}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => cartProvider.increaseQuantity(item.id),
+                        child: Icon(
+                          Icons.add_circle_outline,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Text(
+                          item.quantity.toString(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => cartProvider.decreaseQuantity(item.id),
+                        child: Icon(
+                          Icons.remove_circle_outline,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const Spacer(),
+              IconButton(
+                onPressed: () => cartProvider.deleteItem(item.id),
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+          Divider(color: Colors.grey[200], thickness: 2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomSection(BuildContext context, cartProvider, isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Card(
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: ' Promo Code',
+                      contentPadding: EdgeInsets.all(10),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Container(
-                  height: 44,
-                  width: 44,
-                  decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.white : Colors.black,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: isDarkMode ? Colors.black : Colors.white,
-                  ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                height: 44,
+                width: 44,
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  borderRadius: BorderRadius.circular(5),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total :',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  color: isDarkMode ? Colors.black : Colors.white,
                 ),
-                Text(
-                  '\$ ${cartProvider.totalPrice().toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: SizedBox(
-              height: 60,
-              width: 335,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total :',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+              Text(
+                '\$ ${cartProvider.totalPrice().toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Checkout()),
-                  );
-                },
-                child: Text(
-                  'Check Out',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isDarkMode ? Colors.black : Colors.white,
-                  ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 60,
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDarkMode ? Colors.white : Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Checkout()),
+              ),
+              child: Text(
+                'Check Out',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.black : Colors.white,
                 ),
               ),
             ),

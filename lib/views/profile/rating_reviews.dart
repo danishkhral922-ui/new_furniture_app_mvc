@@ -11,9 +11,9 @@ class RatingReviews extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: GestureDetector(
-          onTap: () => Get.back(),
-          child: const Icon(Icons.arrow_back_ios),
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
         centerTitle: true,
         title: const Text(
@@ -21,84 +21,32 @@ class RatingReviews extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Image.asset('assets/images/minimalstand2.png'),
-                  const SizedBox(width: 16),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Minimal Stand',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.star, color: Colors.amber, size: 24),
-                          SizedBox(width: 4),
-                          Text(
-                            '4.5',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        '10 Reviews',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Divider(color: isDarkMode ? Colors.grey[800] : Colors.grey[200]),
-              const SizedBox(height: 30),
-              _buildReviewCard(
-                name: 'Bruno Fernandes',
-                date: '20/03/2020',
-                imagePath: 'assets/images/feed1.png',
-                reviewText:
-                    'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-              ),
-              const SizedBox(height: 40),
-              _buildReviewCard(
-                name: 'Tracy Mosby',
-                date: '20/03/2020',
-                imagePath: 'assets/images/feed2.png',
-                reviewText:
-                    'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-              ),
-              const SizedBox(height: 40),
-              _buildReviewCard(
-                name: 'Tracy Mosby',
-                date: '20/03/2020',
-                imagePath: 'assets/images/feed3.png',
-                reviewText:
-                    'Nice Furniture with good delivery. The delivery time is very fast. Then products look like exactly the picture in the app. Besides, color is also the same and quality is very good despite very cheap price',
-              ),
-              const SizedBox(height: 80),
-            ],
+      body: Column(
+        children: [
+          _buildHeader(),
+          Divider(color: isDarkMode ? Colors.grey[800] : Colors.grey[200]),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              itemCount: 3,
+              separatorBuilder: (_, __) => const SizedBox(height: 30),
+              itemBuilder: (context, index) {
+                return _buildReviewCard(
+                  name: 'Bruno Fernandes',
+                  date: '20/03/2020',
+                  imagePath: 'assets/images/feed1.png',
+                  reviewText:
+                      'Nice Furniture with good delivery. The delivery time is very fast. The products look exactly like the picture.',
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.85,
         height: 50,
-        width: 334,
         child: FloatingActionButton(
           backgroundColor: isDarkMode ? Colors.white : Colors.black,
           onPressed: () => Get.to(() => const MyReviews()),
@@ -118,6 +66,42 @@ class RatingReviews extends StatelessWidget {
     );
   }
 
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          Image.asset(
+            'assets/images/minimalstand2.png',
+            height: 100,
+            width: 100,
+          ),
+          const SizedBox(width: 16),
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Minimal Stand', style: TextStyle(fontSize: 14)),
+              Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 24),
+                  SizedBox(width: 4),
+                  Text(
+                    '4.5',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              Text(
+                '10 Reviews',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildReviewCard({
     required String name,
     required String date,
@@ -127,67 +111,60 @@ class RatingReviews extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        SizedBox(
-          width: 335,
-          child: Card(
-            elevation: 8,
-            shadowColor: Colors.grey.withAlpha(60),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 24.0,
-                left: 16.0,
-                right: 16.0,
-                bottom: 16.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+        Card(
+          elevation: 4,
+          margin: const EdgeInsets.only(top: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
-                      Text(
-                        date,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: List.generate(
-                      5,
-                      (index) =>
-                          const Icon(Icons.star, color: Colors.amber, size: 20),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    reviewText,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
+                    Text(
+                      date,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: List.generate(
+                    5,
+                    (_) =>
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  reviewText,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-        Positioned(top: -20, right: 147, child: Image.asset(imagePath)),
+        Positioned(
+          top: 0,
+          left: 16,
+          child: CircleAvatar(
+            backgroundImage: AssetImage(imagePath),
+            radius: 20,
+          ),
+        ),
       ],
     );
   }

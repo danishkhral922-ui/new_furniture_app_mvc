@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/views/auth/login.dart';
 
-class Boarding extends StatelessWidget {
+class Boarding extends StatefulWidget {
   const Boarding({super.key});
+
+  @override
+  State<Boarding> createState() => _BoardingState();
+}
+
+class _BoardingState extends State<Boarding> {
+  bool _isVisible = false;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _isVisible = true);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +28,17 @@ class Boarding extends StatelessWidget {
           SizedBox.expand(
             child: Image.asset('assets/images/boarding.png', fit: BoxFit.cover),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
+          AnimatedOpacity(
+            opacity: _isVisible ? 1.0 : 0.0,
+            duration: const Duration(seconds: 1),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
                       'MAKE YOUR',
                       style: TextStyle(
                         fontSize: 24,
@@ -29,12 +46,10 @@ class Boarding extends StatelessWidget {
                         color: Colors.grey,
                       ),
                     ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
+                  ),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
                       'HOME BEAUTIFUL!',
                       style: TextStyle(
                         fontSize: 30,
@@ -42,42 +57,57 @@ class Boarding extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 40),
-                Text(
-                  'The best simple place where you discover most wonderful furnitures and make your home beautiful',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
                   ),
-                ),
-                SizedBox(height: 100),
-                SizedBox(
-                  height: 54,
-                  width: 159,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    onPressed: () {
-                      Get.to(Login());
-                    },
-                    child: Text(
-                      'Gets Started',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                      ),
+                  const SizedBox(height: 40),
+                  const Text(
+                    'The best simple place where you discover most wonderful furnitures and make your home beautiful',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 100),
+                  AnimatedScale(
+                    scale: _isPressed ? 0.9 : 1.0,
+                    duration: const Duration(milliseconds: 100),
+                    child: SizedBox(
+                      height: 54,
+                      width: 159,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        onPressed: () async {
+                          setState(() => _isPressed = true);
+                          await Future.delayed(
+                            const Duration(milliseconds: 150),
+                          );
+                          setState(() => _isPressed = false);
+
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Login()),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          'Gets Started',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

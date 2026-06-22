@@ -24,18 +24,13 @@ class FavouriteProvider extends ChangeNotifier {
     } catch (e) {
       _favouriteBox = await Hive.openBox<FavouriteModel>('favouritesBox');
     }
-
     _loadOfflineItems();
-
     _streamSubscription = _favouriteService.getFavouriteStream().listen((
       items,
     ) async {
       _favouriteItems = items;
-
-      // Hive syncing logic
       await _favouriteBox.clear();
       await _favouriteBox.addAll(items);
-
       _isLoading = false;
       notifyListeners();
     });
@@ -47,6 +42,24 @@ class FavouriteProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> toggleFavourite({
+    required BuildContext context,
+    required String name,
+    required String price,
+    required String image,
+  }) async {
+    if (isFavourite(name)) {
+      await removeFromFavourite(context, name);
+    } else {
+      await _favouriteService.addToFavourite(
+        name: name,
+        price: price,
+        image: image,
+      );
+    }
+    notifyListeners();
   }
 
   Future<void> addToFavourite({

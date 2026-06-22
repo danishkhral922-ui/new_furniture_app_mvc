@@ -21,9 +21,15 @@ class EditProduct extends StatefulWidget {
 }
 
 class _EditProductState extends State<EditProduct> {
+  bool _isVisible = false;
+  bool _isPressed = false;
+
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) setState(() => _isVisible = true);
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<ProductProvider>();
@@ -35,7 +41,6 @@ class _EditProductState extends State<EditProduct> {
 
   @override
   Widget build(BuildContext context) {
-    // Provider ko access karna
     final provider = context.read<ProductProvider>();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -48,95 +53,98 @@ class _EditProductState extends State<EditProduct> {
         ),
         elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: provider.nameController,
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                  ),
+      body: AnimatedOpacity(
+        opacity: _isVisible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 800),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: provider.nameController,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                labelText: 'Edit Product Name',
-                labelStyle: const TextStyle(color: Colors.grey),
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: provider.priceController,
-              keyboardType: TextInputType.number,
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                  ),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Edit Product Name',
                 ),
-                labelText: 'Edit Price',
-                labelStyle: const TextStyle(color: Colors.grey),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: provider.imageController,
-              style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: isDarkMode ? Colors.grey[700]! : Colors.grey,
-                  ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: provider.priceController,
+                keyboardType: TextInputType.number,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
-                labelText: 'Edit Image URL',
-                labelStyle: const TextStyle(color: Colors.grey),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Edit Price',
+                ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Consumer<ProductProvider>(
-              builder: (context, productProvider, child) {
-                return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: isDarkMode ? Colors.white : Colors.black,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  onPressed: productProvider.isLoading
-                      ? null
-                      : () {
-                          productProvider.updateProduct(
-                            context,
-                            widget.productId,
-                          );
-                        },
-                  child: productProvider.isLoading
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: isDarkMode ? Colors.black : Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          'UPDATE PRODUCT',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.black : Colors.white,
-                          ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: provider.imageController,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Edit Image URL',
+                ),
+              ),
+              const SizedBox(height: 30),
+              Consumer<ProductProvider>(
+                builder: (context, productProvider, child) {
+                  return AnimatedScale(
+                    scale: _isPressed ? 0.95 : 1.0,
+                    duration: const Duration(milliseconds: 100),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                );
-              },
-            ),
-          ],
+                        backgroundColor: isDarkMode
+                            ? Colors.white
+                            : Colors.black,
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      onPressed: productProvider.isLoading
+                          ? null
+                          : () async {
+                              setState(() => _isPressed = true);
+                              await Future.delayed(
+                                const Duration(milliseconds: 100),
+                              );
+                              setState(() => _isPressed = false);
+                              productProvider.updateProduct(
+                                context,
+                                widget.productId,
+                              );
+                            },
+                      child: productProvider.isLoading
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: isDarkMode ? Colors.black : Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'UPDATE PRODUCT',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.black : Colors.white,
+                              ),
+                            ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
