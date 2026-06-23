@@ -155,6 +155,7 @@ class ShoppingAddress extends StatelessWidget {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
+              textStyle: TextStyle(color: isDark ? Colors.white : Colors.black),
               backgroundColor: isDark ? Colors.white : Colors.black,
             ),
             onPressed: () {

@@ -4,6 +4,7 @@ import 'package:new_furiniture_app_mvc/controllers/favourite_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:new_furiniture_app_mvc/models/product_model.dart';
 import 'package:new_furiniture_app_mvc/views/cart/cart.dart';
+import 'package:new_furiniture_app_mvc/views/profile/my_reviews.dart';
 
 class Product extends StatelessWidget {
   final ProductModel product;
@@ -14,44 +15,48 @@ class Product extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildImageHeader(context, isDarkMode),
-            const SizedBox(height: 25),
-            _buildProductInfo(isDarkMode),
-            const SizedBox(height: 50),
-            _buildActionButtons(context, isDarkMode),
-            const SizedBox(height: 30),
+            _buildProductImage(context),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 8),
+                  _buildRatingSection(context),
+                  const SizedBox(height: 24),
+                  _buildDescription(isDarkMode),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+      bottomNavigationBar: _buildBottomBar(context, isDarkMode),
     );
   }
 
-  Widget _buildImageHeader(BuildContext context, bool isDarkMode) {
+  Widget _buildProductImage(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 380,
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[900] : Colors.grey[100],
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(40),
-            ),
-          ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.45,
+          width: double.infinity,
           child: Image.network(product.image, fit: BoxFit.cover),
         ),
         Positioned(
           top: 50,
           left: 20,
-          child: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: isDarkMode ? Colors.white : Colors.black,
+          child: CircleAvatar(
+            backgroundColor: Colors.white.withOpacity(0.8),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
         ),
@@ -59,35 +64,50 @@ class Product extends StatelessWidget {
     );
   }
 
-  Widget _buildProductInfo(bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
             product.name,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
-          Text(
-            '\$ ${product.price}',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
+        ),
+        Text(
+          '\$${product.price}',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: Colors.orange,
           ),
-          const SizedBox(height: 20),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRatingSection(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MyReviews()),
+        );
+      },
+      child: Row(
+        children: [
+          const Icon(Icons.star, color: Colors.amber, size: 20),
+          const SizedBox(width: 4),
+          const Text(
+            "4.5",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const SizedBox(width: 8),
           Text(
-            product.description,
+            "(128 Reviews)",
             style: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              height: 1.5,
+              color: Colors.blue[700],
+              decoration: TextDecoration.underline,
             ),
           ),
         ],
@@ -95,76 +115,93 @@ class Product extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget _buildDescription(bool isDarkMode) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Description",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          product.description,
+          style: TextStyle(
+            fontSize: 16,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+            height: 1.6,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context, bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Consumer<FavouriteProvider>(
             builder: (context, fav, _) {
               final isFav = fav.isFavourite(product.name);
-              return GestureDetector(
-                onTap: () async {
-                  try {
-                    if (isFav) {
-                      await fav.removeFromFavourite(context, product.name);
-                    } else {
-                      await fav.addToFavourite(
-                        name: product.name,
-                        price: product.price,
-                        image: product.image,
-                      );
-                    }
-                  } catch (e) {
-                    debugPrint("Fav Error: $e");
+              return IconButton(
+                onPressed: () async {
+                  if (isFav) {
+                    final favItem = fav.favouriteItems.firstWhere(
+                      (item) => item.name == product.name,
+                    );
+                    await fav.removeFavourite(favItem.id);
+                  } else {
+                    await fav.addToFavourite(
+                      name: product.name,
+                      price: product.price.toString(),
+                      image: product.image,
+                    );
                   }
                 },
-                child: Container(
-                  height: 55,
-                  width: 55,
-                  decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[850] : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    isFav ? Icons.favorite : Icons.favorite_border,
-                    color: isFav
-                        ? Colors.red
-                        : (isDarkMode ? Colors.white : Colors.black),
-                  ),
+                icon: Icon(
+                  isFav ? Icons.favorite : Icons.favorite_border,
+                  color: isFav ? Colors.red : Colors.grey,
+                  size: 30,
                 ),
               );
             },
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 20),
           Expanded(
-            child: SizedBox(
-              height: 55,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(8),
-                  ),
-                  backgroundColor: isDarkMode ? Colors.white : Colors.black,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                onPressed: () async {
-                  await context.read<CartProvider>().addToCart(
-                    name: product.name,
-                    price: product.price,
-                    image: product.image,
+              ),
+              onPressed: () async {
+                await context.read<CartProvider>().addToCart(
+                  name: product.name,
+                  price: product.price.toString(),
+                  image: product.image,
+                );
+                if (context.mounted)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Cart()),
                   );
-                  if (context.mounted)
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const Cart()),
-                    );
-                },
-                child: Text(
-                  'Add to cart',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.black : Colors.white,
-                  ),
-                ),
+              },
+              child: const Text(
+                "Add to Cart",
+                style: TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
           ),

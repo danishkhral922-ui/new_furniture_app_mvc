@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class MyReviews extends StatelessWidget {
   const MyReviews({super.key});
@@ -23,7 +22,7 @@ class MyReviews extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         itemCount: 3,
-        separatorBuilder: (_, __) => const SizedBox(height: 16),
+        separatorBuilder: (_, _) => const SizedBox(height: 16),
         itemBuilder: (context, index) {
           return _buildReviewCard(
             productName: 'Minimal Lamp',

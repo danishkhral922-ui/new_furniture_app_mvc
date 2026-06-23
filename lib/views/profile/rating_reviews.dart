@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:new_furiniture_app_mvc/views/profile/my_reviews.dart';
 
 class RatingReviews extends StatelessWidget {
@@ -31,7 +30,7 @@ class RatingReviews extends StatelessWidget {
             child: ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               itemCount: 3,
-              separatorBuilder: (_, __) => const SizedBox(height: 30),
+              separatorBuilder: (_, _) => const SizedBox(height: 30),
               itemBuilder: (context, index) {
                 return _buildReviewCard(
                   name: 'Bruno Fernandes',

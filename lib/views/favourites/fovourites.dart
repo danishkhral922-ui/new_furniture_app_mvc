@@ -7,15 +7,34 @@ class Favourite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Favourite'), centerTitle: true),
+      backgroundColor: isDarkMode ? Colors.black : Colors.grey[50],
+      appBar: AppBar(
+        title: const Text(
+          'My Wishlist',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        elevation: 0,
+        foregroundColor: isDarkMode ? Colors.white : Colors.black,
+      ),
       body: Consumer<FavouriteProvider>(
         builder: (context, favProvider, child) {
           if (favProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
           if (favProvider.favouriteItems.isEmpty) {
-            return const Center(child: Text('Your list is empty'));
+            return Center(
+              child: Text(
+                'Your wishlist is empty',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                ),
+              ),
+            );
           }
 
           return ListView.builder(
@@ -23,31 +42,63 @@ class Favourite extends StatelessWidget {
             itemCount: favProvider.favouriteItems.length,
             itemBuilder: (context, index) {
               final item = favProvider.favouriteItems[index];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 15),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.grey[900] : Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isDarkMode
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
                 child: Row(
                   children: [
-                    Image.network(
-                      item.image,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        item.image,
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             item.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
                           ),
-                          Text(item.price),
+                          const SizedBox(height: 8),
+                          Text(
+                            "\$${item.price}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Colors.orange,
+                              fontSize: 15,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.red),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.redAccent,
+                      ),
                       onPressed: () async {
                         await favProvider.removeFavourite(item.id);
                       },
