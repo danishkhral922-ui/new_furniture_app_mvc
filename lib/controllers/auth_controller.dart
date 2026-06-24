@@ -80,7 +80,7 @@ class AuthProvider extends ChangeNotifier {
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => Home()),
+        MaterialPageRoute(builder: (context) => const Home()),
         (route) => false,
       );
     } on FirebaseAuthException catch (e) {

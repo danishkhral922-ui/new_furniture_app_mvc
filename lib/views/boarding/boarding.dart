@@ -60,7 +60,7 @@ class _BoardingState extends State<Boarding> {
                   ),
                   const SizedBox(height: 40),
                   const Text(
-                    'The best simple place where you discover most wonderful furnitures and make your home beautiful',
+                    'The best simple place where you discover most wonderful furnitures and make your home beautiful.',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
