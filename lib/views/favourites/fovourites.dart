@@ -51,8 +51,8 @@ class Favourite extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                       color: isDarkMode
-                          ? Colors.black.withOpacity(0.3)
-                          : Colors.black.withOpacity(0.05),
+                          ? Colors.black.withValues()
+                          : Colors.black.withValues(),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),

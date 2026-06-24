@@ -53,7 +53,7 @@ class Product extends StatelessWidget {
           top: 50,
           left: 20,
           child: CircleAvatar(
-            backgroundColor: Colors.white.withOpacity(0.8),
+            backgroundColor: Colors.white.withValues(),
             child: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.black),
               onPressed: () => Navigator.pop(context),
@@ -79,7 +79,7 @@ class Product extends StatelessWidget {
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w800,
-            color: Colors.orange,
+            color: Colors.black,
           ),
         ),
       ],
@@ -106,6 +106,7 @@ class Product extends StatelessWidget {
           Text(
             "(128 Reviews)",
             style: TextStyle(
+              fontSize: 10,
               color: Colors.blue[700],
               decoration: TextDecoration.underline,
             ),
@@ -140,14 +141,7 @@ class Product extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
+        color: isDarkMode ? Colors.black : Colors.white,
       ),
       child: Row(
         children: [
@@ -181,7 +175,7 @@ class Product extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: isDarkMode ? Colors.white : Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -199,9 +193,13 @@ class Product extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const Cart()),
                   );
               },
-              child: const Text(
+              child: Text(
                 "Add to Cart",
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.black : Colors.white,
+                ),
               ),
             ),
           ),

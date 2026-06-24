@@ -32,7 +32,7 @@ class ProductModel {
       image: data['image'] ?? '',
 
       description: rawDescription.trim().isEmpty
-          ? 'Minimal Stand is made of natural wood. The design is very simple and minimal.'
+          ? 'Minimal Stand is made of natural wood. The design is very simple and minimal and a Nice Furniture that can be used in every home with comfortable and easy to setup with the easy pricing and used in every room and place'
           : rawDescription,
     );
   }
