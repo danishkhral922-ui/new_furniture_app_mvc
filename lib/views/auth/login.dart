@@ -37,7 +37,6 @@ class _LoginState extends State<Login> {
           child: SafeArea(
             child: Column(
               children: [
-                // ... (Aapke images wahi rahenge)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -82,7 +81,6 @@ class _LoginState extends State<Login> {
                   ),
                 ),
 
-                // Card with slight slide-up animation
                 AnimatedPadding(
                   padding: EdgeInsets.only(top: _isVisible ? 0 : 30),
                   duration: const Duration(milliseconds: 800),
@@ -141,7 +139,6 @@ class _LoginState extends State<Login> {
                               ),
                               const SizedBox(height: 30),
 
-                              // Animated Login Button
                               AnimatedScale(
                                 scale: _isPressed ? 0.95 : 1.0,
                                 duration: const Duration(milliseconds: 100),
@@ -163,6 +160,7 @@ class _LoginState extends State<Login> {
                                         const Duration(milliseconds: 100),
                                       );
                                       setState(() => _isPressed = false);
+
                                       await authProvider.login(context);
                                     },
                                     child: Text(

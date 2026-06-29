@@ -196,7 +196,7 @@ class Cart extends StatelessWidget {
               child: Text(
                 'Check Out',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
                   color: isDarkMode ? Colors.black : Colors.white,
                 ),
               ),

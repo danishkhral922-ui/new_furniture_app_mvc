@@ -27,6 +27,7 @@ import 'package:new_furiniture_app_mvc/views/auth/auth_wrapper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Hive.initFlutter();
 
   await Hive.initFlutter();
   Hive.registerAdapter(ShippingModelAdapter());

@@ -87,7 +87,7 @@ class AuthProvider extends ChangeNotifier {
       _showSnackBar(
         context,
         'Error',
-        e.message ?? 'Something went wrong',
+        e.message ?? 'Something Went Wrong',
         Colors.red[400]!,
       );
     }
